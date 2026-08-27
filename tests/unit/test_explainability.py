@@ -1,6 +1,6 @@
 import pytest
 
-from industrial_energy_lab.explainability.insights import explain_optimization_result, explain_scenario_change
+from industrial_energy_lab.explainability.insights import explain_optimization_result, explain_scenario_change, explain_sensitivity_results
 from industrial_energy_lab.explainability.metrics import METRICS, get_metric, validate_metric_registry
 from industrial_energy_lab.optimization.model import OptimizationResult
 
@@ -67,3 +67,31 @@ def test_scenario_change_reports_capacity_and_cost_direction():
     messages = explain_scenario_change(previous, current)
     assert any("PV capacity increases" in m for m in messages)
     assert any("cost rises" in m for m in messages)
+
+
+def test_sensitivity_explanation_is_derived_from_endpoints():
+    import pandas as pd
+    frame = pd.DataFrame({
+        "status": ["optimal", "optimal"],
+        "input_value": [0.8, 1.2],
+        "pv_capacity_kw": [3000.0, 5000.0],
+        "battery_energy_capacity_kwh": [0.0, 1000.0],
+        "annualized_cost_eur": [1_500_000.0, 2_000_000.0],
+    })
+    messages = explain_sensitivity_results(frame, "electricity_price_multiplier")
+    assert any("PV capacity increases" in m for m in messages)
+    assert any("battery energy increases" in m for m in messages)
+    assert any("Annualized cost increases" in m for m in messages)
+
+
+def test_sensitivity_explanation_brackets_battery_transition():
+    import pandas as pd
+    frame = pd.DataFrame({
+        "status": ["optimal", "optimal", "optimal"],
+        "input_value": [0.70, 0.74, 0.76],
+        "pv_capacity_kw": [4000.0, 4050.0, 4050.0],
+        "battery_energy_capacity_kwh": [500.0, 100.0, 0.0],
+        "annualized_cost_eur": [1_700_000.0, 1_710_000.0, 1_715_000.0],
+    })
+    messages = explain_sensitivity_results(frame, "battery_capex_multiplier")
+    assert any("0.74× and 0.76×" in m for m in messages)

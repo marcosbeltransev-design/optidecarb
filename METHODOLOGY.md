@@ -421,3 +421,16 @@ Tests cover all previous iterations plus:
 - break-even transition logic;
 - Golden Case v3 economic optimum;
 - Golden Case v3 binding 40% carbon case.
+
+
+## 23. Streamlit presentation boundary
+
+Iteration 4 does not change the mathematical model. The UI calls the same validated baseline and optimization services used by tests. Input widgets collect explicit assumptions; a form submit triggers a solve; charts and cards render returned values.
+
+The interface deliberately distinguishes:
+
+- **model assumption** — a user-editable or synthetic validation input;
+- **dataset value** — a value read from a versioned offline snapshot;
+- **calculated result** — an output produced by the engine.
+
+Important inputs and outputs receive educational help from the centralized metric registry. The help describes what a quantity is, its units, why it matters, its calculation, interpretation, relationships and material caveats. The UI does not use generative AI to explain results.

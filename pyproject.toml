@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "industrial-energy-lab"
-version = "0.3.0"
+version = "0.4.0"
 description = "Pre-feasibility techno-economic screening engine for industrial energy decarbonization."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,6 +19,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0,<10",
+]
+app = [
+  "streamlit==1.62.0",
+  "plotly>=6.5,<7",
 ]
 
 [tool.pytest.ini_options]

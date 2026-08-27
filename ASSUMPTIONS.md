@@ -163,3 +163,11 @@ The targeted battery-CAPEX scan in the synthetic Golden v3 case observed positiv
 Not implemented yet. Iteration 5 must state:
 
 > Synthetic representative industrial profile calibrated using publicly available sector information. It does not represent any individual company.
+
+
+## A9. Iteration 4 interface assumptions
+
+- The Streamlit default inputs are loaded from `data/demo/optimization_assumptions.json`; they remain **SYNTHETIC SOFTWARE-VALIDATION ASSUMPTIONS**.
+- Custom load uploads must match the current 8,760-hour UTC demo timeline because Iteration 4 keeps the versioned PV and price snapshots fixed. This is an explicit alignment rule, not a universal limitation of the engine.
+- Sensitivity is run one family at a time and only after user request. This is a product/performance policy, not a change to the underlying equations.
+- UI number formatting intentionally rounds for readability; engine calculations and regression tests retain full numerical precision.

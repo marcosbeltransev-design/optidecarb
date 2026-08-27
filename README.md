@@ -4,7 +4,7 @@
 
 Industrial Energy Lab is an offline-first Python pre-feasibility tool for industrial electrical-energy systems. Its v1 scope is intentionally narrow: 8,760-hour load modelling, PV, battery storage, grid exchange, transparent economics, grid-related CO2 accounting, linear optimization, deterministic sensitivity analysis, and a later representative ceramic-industry case for Castellón, Spain.
 
-> **Status:** Iteration 3 — Optimization is complete locally. The project now contains a validated 8,760-hour physical simulator, an LP sizing/dispatch optimizer solved with HiGHS, carbon constraints, a cost-decarbonization frontier, deterministic sensitivity analysis, rule-based explainability, and frozen Golden Cases v1–v3. Streamlit and the sourced Castellón ceramic case remain intentionally deferred to Iterations 4 and 5.
+> **Status:** Iterations 1–3 are frozen and regression-tested with Golden Cases v1–v3. Iteration 4 has a frozen v0.4 Streamlit implementation: professional navigation, validated inputs, baseline/optimization/economics/hourly/carbon/sensitivity views, and centralized educational help. Local code QA passes; native Streamlit AppTest/browser verification and public deployment remain external acceptance checks because this sandbox cannot install Streamlit and no standalone GitHub remote is currently available. The sourced Castellón ceramic case remains Iteration 5.
 
 ## What problem does it solve?
 
@@ -99,9 +99,27 @@ versioned offline datasets
 - deterministic one-at-a-time sensitivity analysis;
 - on-demand sensitivity-family execution for interactive use;
 - battery CAPEX break-even scan support;
-- 58-metric explainability registry for future `?` help controls;
+- 58-metric explainability registry used by Streamlit help controls;
 - deterministic result-based insights without generative AI;
 - Golden Case v3 and binding-carbon regression.
+
+
+### Iteration 4 — Streamlit engineering interface
+
+- nine-section engineering UI: Overview, Inputs, Baseline, Optimized system, Hourly results, Economics, Decarbonization, Sensitivity and Methodology;
+- `st.form`-based input workflow so editing assumptions does not repeatedly solve the annual LP;
+- session-state storage only for current inputs/results, with no database or backend;
+- native Streamlit help controls driven by the centralized explainability registry;
+- explicit synthetic-assumption/source messaging for demo inputs;
+- validated optional 8,760-hour load CSV upload aligned to the current PV/price timeline;
+- rule-based “Why this solution?” explanations;
+- Plotly load-duration, monthly-consumption, hourly-energy, SOC, economics, carbon-frontier and sensitivity charts;
+- friendly infeasible/solver error handling with optional technical details;
+- carbon-frontier solves only targets stricter than the economic optimum;
+- sensitivity is one family at a time, on demand;
+- Streamlit AppTest smoke test included in CI and skipped only when the optional Streamlit dependency is absent locally.
+
+The UI contains orchestration and presentation only. All engineering calculations still come from `core/`, `economics/` and `optimization/`.
 
 ## Solver backend
 
@@ -149,9 +167,9 @@ This contrast is deliberate: it demonstrates that storage can be absent from the
 
 Targets already met by the unconstrained economic optimum reuse that mathematically identical solution instead of re-solving the annual LP.
 
-## Explainability and future `?` controls
+## Explainability and `?` controls
 
-`src/industrial_energy_lab/explainability/metrics.py` is the single source of truth for future help icons. Each important metric contains:
+`src/industrial_energy_lab/explainability/metrics.py` is the single source of truth for UI help icons. Each important metric contains:
 
 - label and unit;
 - plain-language definition;
@@ -161,7 +179,7 @@ Targets already met by the unconstrained economic optimum reuse that mathematica
 - relationships with other metrics;
 - caveats.
 
-Iteration 4 will render that metadata beside each important metric card as a `?` help control. Explanations are not duplicated across pages.
+The Iteration 4 interface renders that metadata beside important inputs and metric cards through Streamlit help controls. Explanations are not duplicated across pages.
 
 `insights.py` adds deterministic result-driven statements such as whether a carbon constraint is binding, whether optimal storage is zero, how capacities change between two solved scenarios, and whether modeled abatement cost is positive or negative.
 
@@ -175,7 +193,7 @@ cd industrial-energy-lab
 python -m venv .venv
 # Linux/macOS: source .venv/bin/activate
 # Windows: .venv\Scripts\activate
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,app]"
 ```
 
 ## Reproduce the demo datasets
@@ -193,6 +211,14 @@ python scripts/run_baseline.py
 python scripts/run_scenario.py
 python scripts/run_optimization.py
 ```
+
+## Run the Streamlit interface
+
+```bash
+streamlit run app.py
+```
+
+The app dependency is pinned to Streamlit 1.62.0 for reproducible Iteration 4 validation.
 
 ## Run validation
 
@@ -219,7 +245,7 @@ Engine input is normalized to exactly 8,760 uninterrupted UTC hours. Leap-year a
 1. **Energy Engine** — complete/frozen.
 2. **8,760h + PV + Battery** — complete/frozen.
 3. **Optimization** — complete/frozen after v0.3 validation.
-4. **Streamlit Web** — next; metric cards will consume the centralized `?` explainability registry.
+4. **Streamlit Web** — v0.4 implementation frozen; native Streamlit/browser/deployment acceptance remains pending in an installable runtime with a standalone GitHub remote.
 5. **Castellón Ceramic Case** — sourced representative case study.
 
 After Iteration 5, v1.0 is considered complete. Any thermal or hydrogen extension requires an explicit product decision.
@@ -227,3 +253,8 @@ After Iteration 5, v1.0 is considered complete. Any thermal or hydrogen extensio
 ## License
 
 MIT for project code and project-generated synthetic demo data. External datasets added later must retain their own source/license metadata.
+
+
+### Iteration 4 validation boundary
+
+The v0.4 implementation, service-layer tests, explainability checks, dependency manifest and CI smoke test are complete and frozen. In this sandbox, 66 tests pass and the single native Streamlit `AppTest` is skipped only because the optional Streamlit package cannot be downloaded. Visual browser verification, screenshots and Community Cloud deployment require an installable Streamlit runtime plus a standalone GitHub remote. These are deployment acceptance checks, not unfinished engine/UI implementation.
