@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.4.0-rc1 — Iteration 4: Streamlit Web candidate
+
+### Added
+
+- Streamlit engineering interface with nine focused sections;
+- form-submit optimization workflow and limited session-state result persistence;
+- central metric/input help rendered through native Streamlit `help` controls;
+- deterministic result explanations and sensitivity observations;
+- baseline, hourly, SOC, economics, cost-decarbonization and sensitivity Plotly charts;
+- on-demand carbon-frontier and one-family sensitivity execution;
+- strict optional 8,760-hour custom-load upload aligned to the versioned demo timeline;
+- friendly infeasible/unbounded/solver-error presentation;
+- `requirements.txt`, pinned Streamlit 1.62.0 app extra and Streamlit theme configuration;
+- UI unit/service tests and optional native `AppTest` smoke test for CI.
+
+### Preserved
+
+- v0.3 optimization model and Golden Cases v1–v3;
+- engineering equations remain outside Streamlit;
+- no database, backend, auth, generative AI or external runtime API dependency.
+
+### Acceptance still blocked by current sandbox
+
+- the current runtime cannot download/install Streamlit or its missing dependencies;
+- therefore native AppTest/browser visual verification, screenshots and public Community Cloud deployment cannot be executed here;
+- the Iteration 4 branch remains a release candidate rather than being declared complete.
+
 ## 0.3.0 — Iteration 3: Optimization + Carbon + Explainability
 
 ### Added

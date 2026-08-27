@@ -20,6 +20,10 @@ dependencies = [
 dev = [
   "pytest>=8.0,<10",
 ]
+app = [
+  "streamlit==1.62.0",
+  "plotly>=6.5,<7",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
