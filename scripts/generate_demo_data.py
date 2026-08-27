@@ -162,6 +162,41 @@ def main() -> None:
         json.dumps(scenario_assumptions, indent=2) + "\n", encoding="utf-8"
     )
 
+    optimization_assumptions = {
+        "status": "ASSUMPTION / SOFTWARE VALIDATION ONLY",
+        "pv_capex_eur_per_kw": 1600.0,
+        "pv_opex_eur_per_kw_year": 10.0,
+        "pv_lifetime_years": 25,
+        "battery_energy_capex_eur_per_kwh": 150.0,
+        "battery_power_capex_eur_per_kw": 100.0,
+        "battery_opex_eur_per_kwh_year": 2.0,
+        "battery_opex_eur_per_kw_year": 1.0,
+        "battery_lifetime_years": 15,
+        "wacc": 0.05,
+        "project_life_years": 15,
+        "battery_charge_efficiency": 0.95,
+        "battery_discharge_efficiency": 0.95,
+        "battery_min_soc_fraction": 0.10,
+        "battery_max_soc_fraction": 0.90,
+        "battery_initial_soc_fraction": 0.10,
+        "max_pv_capacity_kw": 12000.0,
+        "max_battery_energy_kwh": 12000.0,
+        "max_battery_power_kw": 6000.0,
+        "export_price_eur_per_mwh": 20.0,
+        "grid_emissions_factor_kg_co2_per_mwh": 180.0,
+        "emissions_export_credit": False,
+        "battery_charging_source": "PV surplus only",
+        "optimization_problem": "linear programming (LP)",
+        "solver_backend": "HiGHS via scipy.optimize.linprog",
+        "note": "Synthetic Iteration 3 optimization assumptions for software validation; not a recommendation or current Spanish market dataset.",
+        "model_version": "0.3.0",
+        "dataset_version": "demo-v1",
+        "case_version": "golden-v3"
+    }
+    (DEMO / "optimization_assumptions.json").write_text(
+        json.dumps(optimization_assumptions, indent=2) + "\n", encoding="utf-8"
+    )
+
 
 if __name__ == "__main__":
     main()

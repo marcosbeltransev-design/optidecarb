@@ -1,13 +1,11 @@
-"""Version identifiers kept separate from package release numbering."""
+"""Version identifiers kept separate from historical regression cases."""
 
-# Current physical model release.
-MODEL_VERSION = "0.2.0"
-DATASET_VERSION = "demo-v1"
+MODEL_VERSION = "0.3.0"
+OPTIMIZATION_MODEL_VERSION = "0.3.0"
+OPTIMIZATION_CASE_VERSION = "golden-v3"
+SCENARIO_MODEL_VERSION = "0.2.0"
 SCENARIO_CASE_VERSION = "golden-v2"
-
-# Frozen identifiers retained so Iteration 1's golden regression remains historical.
+DATASET_VERSION = "demo-v1"
 BASELINE_MODEL_VERSION = "0.1.0"
 BASELINE_CASE_VERSION = "golden-v1"
-
-# Backward-compatible alias for code that needs the current scenario case.
-CASE_VERSION = SCENARIO_CASE_VERSION
+CASE_VERSION = OPTIMIZATION_CASE_VERSION

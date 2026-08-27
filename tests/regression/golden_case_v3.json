@@ -1,0 +1,43 @@
+{
+  "status": "SYNTHETIC SOFTWARE-VALIDATION GOLDEN CASE",
+  "model_version": "0.3.0",
+  "dataset_version": "demo-v1",
+  "case_version": "golden-v3",
+  "assumptions_file": "data/demo/optimization_assumptions.json",
+  "economic_optimum": {
+    "status": "optimal",
+    "objective_annualized_cost_eur": 1750017.9812217844,
+    "pv_capacity_kw": 4088.34874902696,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "grid_import_mwh": 14648.653775166202,
+    "grid_export_mwh": 880.0901869506566,
+    "initial_capex_eur": 6541357.998443136,
+    "project_npv_eur": 545573.2250516671,
+    "simple_payback_years": 9.580600825370347,
+    "baseline_emissions_tco2": 3960.0000000030604,
+    "scenario_emissions_tco2": 2636.7576795299165,
+    "emissions_reduction_tco2": 1323.242320473144,
+    "emissions_reduction_fraction": 0.3341521011293236,
+    "carbon_constraint_binding": false,
+    "abatement_cost_eur_per_tco2": -165.23484682622626
+  },
+  "carbon_target_40pct": {
+    "status": "optimal",
+    "objective_annualized_cost_eur": 1773669.7137727544,
+    "pv_capacity_kw": 5209.886210434081,
+    "battery_energy_capacity_kwh": 2595.8842555984916,
+    "battery_power_capacity_kw": 493.21800856371146,
+    "grid_import_mwh": 13200.000000010234,
+    "grid_export_mwh": 1623.5056400760402,
+    "initial_capex_eur": 8774522.375890672,
+    "project_npv_eur": -172831.6166728001,
+    "simple_payback_years": 10.588213905796168,
+    "baseline_emissions_tco2": 3960.0000000030604,
+    "scenario_emissions_tco2": 2376.000000001842,
+    "emissions_reduction_tco2": 1584.0000000012183,
+    "emissions_reduction_fraction": 0.3999999999999985,
+    "carbon_constraint_binding": true,
+    "abatement_cost_eur_per_tco2": -123.102278779192
+  }
+}

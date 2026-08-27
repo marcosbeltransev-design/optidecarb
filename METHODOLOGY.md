@@ -1,242 +1,423 @@
-# Methodology — Iterations 1–2
+# Methodology — Iterations 1–3
 
 ## 1. Scope
 
-Iteration 1 freezes the grid-only electrical baseline. Iteration 2 adds an offline, deterministic 8,760-hour simulation of PV, battery storage and grid exchange for **user-defined** capacities. There is still no mathematical sizing optimization; that is reserved for Iteration 3.
+Industrial Energy Lab is an electrical **pre-feasibility screening** model. Iteration 1 defines the grid-only baseline, Iteration 2 validates deterministic PV+battery physics for user-defined sizes, and Iteration 3 adds linear techno-economic sizing/dispatch optimization, carbon constraints, deterministic sensitivity, and explainability.
+
+No thermal process, hydrogen, cogeneration, network power flow, tax model, detailed tariff model, degradation model, or investment recommendation is included.
 
 ## 2. Time basis and units
 
-The engine uses uninterrupted one-hour UTC intervals and exactly 8,760 rows.
+The engine uses exactly 8,760 uninterrupted one-hour UTC intervals.
 
 - average power: kW;
-- interval energy: kWh;
+- one-hour interval energy: kWh;
 - annual energy: MWh;
-- prices: EUR/MWh;
+- electricity price: EUR/MWh;
 - emissions factor: kgCO2/MWh;
-- annual emissions: tCO2.
+- annual emissions: tCO2;
+- CAPEX: EUR, EUR/kW or EUR/kWh;
+- annualized/OPEX values: EUR/year.
 
-For a one-hour interval, a `load_kw` value has the same numeric value as interval energy in kWh.
+Because `Delta t = 1 h`, a kW average over one interval has the same numeric value as kWh in that interval. Code still names energy variables explicitly in kWh to avoid hidden unit conversion.
 
 ### DST and leap years
 
-The core does not silently repair local-time DST or leap-year anomalies. An adapter/pre-processing layer must normalize them before the engine. Inputs with 8,784 rows, duplicate timestamps, missing hours or non-hourly spacing fail validation.
+The engine never silently repairs time-series anomalies. Local-time DST and 8,784-hour leap-year datasets must be normalized upstream before entering the core.
 
 ## 3. Grid-only baseline
-
-For every hour:
 
 ```text
 GridImport_t = Load_t
 GridExport_t = 0
 ```
 
-Annual consumption:
-
 ```text
-E_load,MWh = sum_t(Load_t,kWh) / 1000
+E_load,MWh = sum(Load_t,kWh) / 1000
 ```
 
-## 4. PV model
-
-PV uses installed AC-equivalent capacity and an offline normalized hourly capacity factor:
-
 ```text
-PV_t [kWh] = P_PV [kW] * CF_t [-] * Delta_t [h]
+BaselineCost = sum(GridImport_t / 1000 * ImportPrice_t)
 ```
 
-For the current one-hour model:
+## 4. PV
 
 ```text
-Delta_t = 1 h
+PVGeneration_t [kWh] = PVCapacity [kW] * CF_t [-]
+```
+
+with:
+
+```text
 0 <= CF_t <= 1
+PVCapacity >= 0
 ```
 
-The demo PV profile is synthetic and is not presented as PVGIS output.
+In Iteration 3 `PVCapacity` is a decision variable.
 
 ## 5. Battery convention
 
-Battery state of charge is stored as **energy in kWh**. Charge and discharge variables are defined at the site's AC bus:
-
-- `battery_charge_kwh`: AC energy entering the battery charger;
-- `battery_discharge_kwh`: AC energy delivered from the battery to site load;
-- `SOC_kWh`: stored electrochemical-energy state used by the simplified model.
-
-Charging:
+Charge/discharge are AC-bus energies; SOC is stored energy in kWh.
 
 ```text
-SOC_(t+1) = SOC_t + eta_c * E_charge,t
+SOC_t = SOC_(t-1) + eta_c * Charge_t - Discharge_t / eta_d
 ```
 
-Discharging:
+where:
+
+- `Charge_t` is PV energy sent to storage from the AC allocation;
+- `Discharge_t` is AC energy delivered from storage to site load.
+
+Losses:
 
 ```text
-SOC_(t+1) = SOC_t - E_discharge,t / eta_d
+BatteryLoss_t
+= Charge_t * (1 - eta_c)
++ Discharge_t * (1/eta_d - 1)
 ```
 
-Combined:
+Capacity-dependent SOC bounds:
 
 ```text
-SOC_(t+1) = SOC_t + eta_c * E_charge,t - E_discharge,t / eta_d
+SOC_min_fraction * BatteryEnergy
+<= SOC_t <=
+SOC_max_fraction * BatteryEnergy
 ```
 
-Losses are explicit:
+Power limits for each one-hour interval:
 
 ```text
-ChargeLoss_t = E_charge,t * (1 - eta_c)
-DischargeLoss_t = E_discharge,t * (1/eta_d - 1)
-BatteryLoss_t = ChargeLoss_t + DischargeLoss_t
+Charge_t <= BatteryPower
+Discharge_t <= BatteryPower
 ```
 
-Bounds:
+## 6. Iteration 2 deterministic dispatch
+
+1. PV serves load.
+2. Surplus PV charges the battery.
+3. Remaining surplus is exported.
+4. Battery serves later deficits.
+5. Grid serves the residual deficit.
+
+It is physical validation, not cost optimization.
+
+## 7. Iteration 3 optimization variables
+
+Capacity decisions:
 
 ```text
-SOC_min <= SOC_t <= SOC_max
-0 <= E_charge,t <= P_battery * Delta_t
-0 <= E_discharge,t <= P_battery * Delta_t
+PVCapacity >= 0
+BatteryEnergy >= 0
+BatteryPower >= 0
 ```
 
-## 6. Deterministic dispatch policy
-
-Iteration 2 deliberately uses a transparent greedy rule, not economic optimization:
-
-1. PV serves site load directly.
-2. Surplus PV charges the battery within power and SOC limits.
-3. Remaining PV surplus is exported.
-4. During a deficit, the battery discharges to site load within power and SOC limits.
-5. The grid supplies the remaining deficit.
-
-The battery cannot charge from the grid and cannot export to the grid in Iteration 2. There is no time-of-use arbitrage logic. Consequently, `GridExport_t = PVExport_t` in this iteration, while both concepts remain explicit for future optimization layers.
-
-## 7. Hourly energy balances
-
-Load balance:
+Hourly LP variables retained explicitly:
 
 ```text
-Load_t = PV_to_load_t + Battery_discharge_t + Grid_import_t
+PVToLoad_t >= 0
+PVToBattery_t >= 0
+BatteryDischarge_t >= 0
+SOC_t >= 0
 ```
 
-PV balance:
+`GridImport_t` and `PVExport_t` are **exact residual flows**, not independent decision variables:
 
 ```text
-PV_t = PV_to_load_t + PV_to_battery_t + PV_export_t
+GridImport_t
+= Load_t - PVToLoad_t - BatteryDischarge_t
 ```
-
-Because all battery losses and SOC changes are explicit, the complete system balance is:
 
 ```text
-PV_t + GridImport_t + SOC_start,t
-=
-Load_t + GridExport_t + BatteryLoss_t + SOC_end,t
+PVExport_t
+= CF_t * PVCapacity - PVToLoad_t - PVToBattery_t
 ```
 
-The implementation checks these invariants to tight numerical tolerance.
-
-## 8. Simultaneous-flow policy
-
-Under the deterministic Iteration 2 dispatch:
+The equivalent non-negativity constraints are:
 
 ```text
-BatteryCharge_t * BatteryDischarge_t = 0
-GridImport_t * GridExport_t = 0
+PVToLoad_t + BatteryDischarge_t <= Load_t
 ```
-
-No binary variables are needed because this is algorithmic dispatch, not an LP.
-
-## 9. Initial and final SOC policy
-
-Iteration 2 does **not** force `SOC_final = SOC_initial`. The initial SOC is an explicit user input and final SOC is reported, together with net stored-energy change.
-
-For annual economic regression, the golden case starts at minimum SOC, preventing a free initial-energy windfall. The optimizer in Iteration 3 will explicitly evaluate a cyclic end condition to prevent boundary exploitation.
-
-## 10. Annual metrics
-
-PV self-consumption is defined at the AC bus as PV that is not exported:
 
 ```text
-PV_self_consumed = PV_generation - Grid_export
-SelfConsumptionRatio = PV_self_consumed / PV_generation
+PVToLoad_t + PVToBattery_t <= CF_t * PVCapacity
 ```
 
-If PV generation is zero, the ratio is defined as zero.
+This elimination reduces the annual model from `6n+3` to `4n+3` variables without approximation.
 
-Self-sufficiency is the fraction of site demand not supplied by grid imports:
+## 8. Battery charging-source policy
+
+The MVP uses:
+
+# PV-CHARGED BATTERY ONLY
+
+`PVToBattery_t` belongs to the PV allocation constraint, so grid electricity cannot directly charge the battery. Battery discharge belongs to the onsite load balance and cannot be exported.
+
+This deliberately excludes grid-to-battery arbitrage in v1.
+
+## 9. Cyclic annual SOC
+
+Iteration 3 prevents free boundary energy by enforcing:
 
 ```text
-SelfSufficiencyRatio = (Load - Grid_import) / Load
+SOC_final = initial_SOC_fraction * BatteryEnergy
 ```
 
-If load is zero, the ratio is defined as zero.
+and the first interval starts from the same fraction of optimized battery capacity. Thus annual optimization cannot improve results by starting full and ending empty.
 
-## 11. Electricity economics
+## 10. Simultaneous flows in the LP
 
-Grid import cost:
+No binary variables are introduced.
+
+### Import/export
+
+Input validation requires:
 
 ```text
-PurchaseCost = sum_t(GridImport_t [MWh] * ImportPrice_t [EUR/MWh])
+ExportPrice_t < ImportPrice_t
 ```
 
-Export revenue:
+for every hour. Under the linear objective, simultaneous import/export cannot improve cost because redirecting one kWh of exported PV to onsite load avoids a higher purchase price.
+
+### Charge/discharge
+
+Battery conversion efficiencies are <=1, direct PV-to-load is more efficient than cycling, and a tiny positive throughput tie-break cost removes numerically degenerate cycling without materially changing economics.
+
+Regression tests verify no material simultaneous charge/discharge or import/export in solved cases.
+
+## 11. Model/site bounds
+
+Configurable upper bounds are not universal engineering facts:
 
 ```text
-ExportRevenue = sum_t(GridExport_t [MWh] * ExportPrice_t [EUR/MWh])
+PVCapacity <= MaxPV
+BatteryEnergy <= MaxBatteryEnergy
+BatteryPower <= MaxBatteryPower
 ```
 
-Net grid-energy cost:
+They represent screening/site limits, prevent nonsensical unbounded sizing, and allow feasibility analysis.
+
+## 12. Annualized objective
+
+PV CRF:
 
 ```text
-NetGridEnergyCost = PurchaseCost - ExportRevenue
+CRF_pv = r(1+r)^Npv / ((1+r)^Npv - 1)
 ```
 
-Iteration 2 operating saving:
+Battery uses its own lifetime and therefore its own CRF.
+
+Annual technology costs:
 
 ```text
-AnnualOperatingSaving = BaselineEnergyCost - NetGridEnergyCost
+AnnualPV
+= PVCapacity * (PV_CAPEX_per_kW * CRF_pv + PV_OPEX_per_kW_year)
 ```
-
-This is an operating-energy comparison only; it is **not** an investment recommendation and does not yet decide optimal PV/battery CAPEX.
-
-## 12. Grid-related emissions
 
 ```text
-CO2_grid [tCO2] = GridImport [MWh] * EF [kgCO2/MWh] / 1000
+AnnualBattery
+= BatteryEnergy * (BatteryEnergyCAPEX * CRF_bat + BatteryEnergyOPEX)
++ BatteryPower * (BatteryPowerCAPEX * CRF_bat + BatteryPowerOPEX)
 ```
 
-Iteration 2 gives **no CO2 credit for exported energy**. This avoids silently assuming displaced-grid emissions before an explicit methodology is chosen.
-
-## 13. Financial primitives retained from Iteration 1
-
-NPV:
+Grid economics:
 
 ```text
-NPV = -CAPEX + sum_(n=1..N)(CF_n / (1+r)^n)
+PurchaseCost
+= sum(GridImport_t / 1000 * ImportPrice_t)
 ```
-
-Capital recovery factor for `r != 0`:
 
 ```text
-CRF = r(1+r)^N / ((1+r)^N - 1)
-AnnualizedCAPEX = CAPEX * CRF
+ExportRevenue
+= sum(PVExport_t / 1000 * ExportPrice_t)
 ```
 
-Simple payback:
+Objective:
 
 ```text
-SimplePayback = CAPEX / AnnualNetSavings
+min TotalAnnualizedCost
+= AnnualPV
++ AnnualBattery
++ PurchaseCost
+- ExportRevenue
 ```
 
-## 14. Validation strategy
+NPV is **not** mixed into the LP objective.
 
-Tests cover:
+## 13. Project NPV and simple payback post-processing
 
-- frozen grid-only Golden Case v1;
-- PV capacity-factor bounds and scaling;
-- manual battery efficiency examples;
-- SOC and battery power limits;
-- exact three-hour hand-checkable dispatch;
-- hourly load, PV and full-system energy conservation;
-- no simultaneous charge/discharge;
-- no simultaneous import/export;
-- zero PV, zero battery and zero-system cases;
-- zero PV + zero battery reproducing the Iteration 1 baseline;
-- 8,760-hour scenario economics and emissions;
-- frozen Golden Case v2.
+Initial CAPEX:
+
+```text
+InitialCAPEX
+= PVCapacity * PV_CAPEX
++ BatteryEnergy * BatteryEnergyCAPEX
++ BatteryPower * BatteryPowerCAPEX
+```
+
+Simplified annual project cash flow:
+
+```text
+AnnualProjectCashFlow
+= BaselineGridCost
+- ScenarioNetGridCost
+- PV_OPEX
+- Battery_OPEX
+```
+
+```text
+NPV
+= -InitialCAPEX
++ sum(AnnualProjectCashFlow / (1+r)^year)
+```
+
+```text
+SimplePayback
+= InitialCAPEX / AnnualProjectCashFlow
+```
+
+The v0.3 NPV model deliberately excludes replacements, degradation, salvage value, taxes, depreciation and financing structure beyond WACC. Project life is not allowed to exceed the shortest modeled technology lifetime in this simplified no-replacement calculation.
+
+## 14. Emissions
+
+No export credit:
+
+```text
+ScenarioCO2 [tCO2]
+= GridImport [MWh] * GridEF [kgCO2/MWh] / 1000
+```
+
+```text
+DeltaCO2 = BaselineCO2 - ScenarioCO2
+```
+
+```text
+ReductionFraction = DeltaCO2 / BaselineCO2
+```
+
+## 15. Carbon constraint
+
+For target `r`:
+
+```text
+ScenarioCO2 <= (1-r) * BaselineCO2
+```
+
+or equivalently, required avoided grid imports must be at least `r` times baseline grid-related emissions.
+
+`r=0` reproduces the pure economic optimum.
+
+A target is reported as **binding** when optimized emissions lie at the allowed maximum within numerical tolerance. A looser target already satisfied by the unconstrained optimum is non-binding.
+
+## 16. Solver states
+
+The solver layer translates HiGHS outcomes to:
+
+- `optimal`;
+- `infeasible`;
+- `unbounded`;
+- `solver_error`.
+
+An infeasible target is not treated as a software failure.
+
+## 17. Abatement cost
+
+```text
+DeltaCost
+= ScenarioAnnualizedCost - BaselineAnnualCost
+```
+
+```text
+AbatementCost [EUR/tCO2]
+= DeltaCost / DeltaCO2
+```
+
+- negative: modeled CO2 is reduced while equivalent annual cost also falls;
+- positive: modeled reduction carries additional equivalent annual cost;
+- undefined if no positive CO2 reduction occurs.
+
+## 18. Cost-decarbonization frontier
+
+The default targets are:
+
+```text
+0%, 10%, 20%, 30%, 40%, 50%
+```
+
+The unconstrained economic optimum is solved once. Any lower target already satisfied by it uses the same exact optimum; only stricter targets require additional solves.
+
+The frontier reports capacity, cost, grid exchange, emissions, abatement cost, feasibility and whether the carbon constraint binds.
+
+## 19. Deterministic sensitivity
+
+One parameter is changed at a time while all others remain fixed. Default multipliers are:
+
+```text
+0.8, 0.9, 1.0, 1.1, 1.2
+```
+
+Variables:
+
+- electricity-price multiplier;
+- PV-CAPEX multiplier;
+- battery-CAPEX multiplier;
+- WACC;
+- grid-emission-factor multiplier;
+- carbon target.
+
+A constant emission-factor change without a carbon constraint does not enter the economic objective, so it changes absolute tCO2 values but not the cost-optimal design or percentage reduction. The implementation derives those rows without redundant LP solves.
+
+### On-demand execution policy
+
+Interactive use runs **one sensitivity family at a time**. This is a deliberate product and performance decision: a user selects electricity price, PV CAPEX, battery CAPEX, WACC, emission factor, or carbon target, then only that family is solved. The lower-level multi-family routine remains available for scripted analysis, but the Streamlit UI must not calculate every family on each rerun.
+
+## 20. Explainability layer
+
+The metric registry is a single structured source for future UI help controls. Each metric contains:
+
+```text
+metric_id
+label
+short_description
+unit
+why_it_matters
+calculation
+interpretation
+relationships
+caveats
+```
+
+Rule-based insights compare actual results only. They can state observed facts such as:
+
+- battery optimum is zero;
+- carbon constraint is binding;
+- PV/battery capacity increases between targets;
+- annualized cost rises between solved scenarios;
+- abatement cost is negative or positive.
+
+They do not use generative AI to invent causal explanations.
+
+## 21. Solver implementation choice
+
+The LP is solved using HiGHS via SciPy `linprog` in v0.3. Unconstrained economic problems use HiGHS dual simplex; explicit carbon-constrained problems use HiGHS interior-point because it was more stable for the annual regression case in the available runtime.
+
+Pyomo + HiGHS remains architecturally possible, but adding an untested dependency layer would not improve the current validated LP. The physical/economic formulation is solver-independent and isolated in `optimization/`.
+
+## 22. Validation strategy
+
+Tests cover all previous iterations plus:
+
+- hand-computable no-investment optimum;
+- hand-computable PV optimum;
+- cheap-storage entry;
+- manually known carbon-constrained optimum;
+- infeasible target distinction;
+- cyclic SOC;
+- energy conservation;
+- no material simultaneous flows;
+- input validation and anti-arbitrage price ordering;
+- metric registry completeness and relationship validity;
+- deterministic result insights;
+- frontier reuse of non-binding economic optimum;
+- break-even transition logic;
+- Golden Case v3 economic optimum;
+- Golden Case v3 binding 40% carbon case.

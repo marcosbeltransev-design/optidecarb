@@ -11,7 +11,7 @@ from industrial_energy_lab.core.pv import pv_generation_kwh
 from industrial_energy_lab.economics.emissions import grid_emissions_tco2
 from industrial_energy_lab.economics.grid import annual_grid_cashflow_eur
 from industrial_energy_lab.schemas.models import GridAssumptions, ScenarioResult
-from industrial_energy_lab.utils.version import DATASET_VERSION, MODEL_VERSION, SCENARIO_CASE_VERSION
+from industrial_energy_lab.utils.version import DATASET_VERSION, SCENARIO_MODEL_VERSION, SCENARIO_CASE_VERSION
 from industrial_energy_lab.validation.datasets import validate_hourly_dataframe
 
 
@@ -72,7 +72,7 @@ def run_pv_battery_scenario(
         annual_net_grid_energy_cost_eur=cashflow["net_grid_energy_cost_eur"],
         annual_operating_savings_eur=baseline_cost - cashflow["net_grid_energy_cost_eur"],
         annual_emissions_tco2=emissions,
-        model_version=MODEL_VERSION,
+        model_version=SCENARIO_MODEL_VERSION,
         dataset_version=DATASET_VERSION,
         case_version=SCENARIO_CASE_VERSION,
     )

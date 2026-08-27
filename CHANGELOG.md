@@ -1,42 +1,73 @@
 # Changelog
 
+## 0.3.0 — Iteration 3: Optimization + Carbon + Explainability
+
+### Added
+
+- sparse 8,760-hour linear sizing/dispatch optimization;
+- optimal PV, battery energy and battery power capacities;
+- cyclic annual SOC condition;
+- PV-only battery charging and load-only battery discharge;
+- configurable site/model capacity bounds;
+- exact residual grid-import and PV-export formulation;
+- HiGHS solver backend through SciPy `linprog`;
+- dual-simplex strategy for economic optimum and interior-point strategy for carbon-constrained annual cases;
+- technology-specific annualized CAPEX/OPEX objective;
+- post-processed project NPV and simple payback;
+- explicit CO2-reduction constraint and binding/slack detection;
+- solver-state normalization (`optimal`, `infeasible`, `unbounded`, `solver_error`);
+- cost-decarbonization frontier with exact reuse of non-binding economic optimum;
+- deterministic one-at-a-time sensitivity analysis;
+- on-demand sensitivity-family API for the future Streamlit interface;
+- battery CAPEX break-even transition helper;
+- 58-metric centralized explainability registry for Iteration 4 help icons;
+- deterministic result/scenario comparison insights;
+- `data/demo/optimization_assumptions.json`;
+- Golden Case v3 economic optimum and binding-carbon regression;
+- `docs/OPTIMIZATION_GUIDE.md`.
+
+### Performance/architecture
+
+- eliminated redundant hourly import/export decision variables, reducing annual LP size from `6n+3` to `4n+3` variables without changing physical results;
+- avoided repeated solves for carbon targets already met by the economic optimum;
+- avoided redundant re-optimization when only a constant grid-emissions factor changes with no carbon constraint.
+
+### Preserved
+
+- Golden Case v1 remains frozen (`0.1.0`, `golden-v1`);
+- Golden Case v2 remains frozen (`0.2.0`, `golden-v2`);
+- hourly dataset version remains `demo-v1`;
+- engine remains offline with no runtime HTTP/API dependency.
+
+### Explicitly not included
+
+Streamlit UI, public deployment, real Castellón ceramic assumptions, thermal technologies, hydrogen, Monte Carlo and generative-AI explanations.
+
 ## 0.2.0 — Iteration 2: 8,760h PV + Battery
 
 ### Added
 
 - offline PV generation module using installed capacity and normalized hourly capacity factor;
-- battery specification with energy/power limits, AC-side charge/discharge efficiencies and SOC bounds;
+- battery specification with energy/power limits, AC-side efficiencies and SOC bounds;
 - deterministic PV-first annual dispatch;
-- explicit PV-to-load, PV-to-battery, PV export, battery discharge and grid import/export flows;
-- explicit battery conversion losses and SOC trajectory;
-- annual physical summary, self-consumption and self-sufficiency ratios;
-- grid import cost, export revenue, net grid-energy cost and operating-savings calculation;
-- scenario grid-emissions calculation with no export credit;
-- synthetic `scenario_assumptions.json` for reproducible software validation;
-- hand-checkable dispatch tests, annual physical-invariant tests and Golden Case v2;
-- `scripts/run_scenario.py`.
+- explicit battery losses and SOC trajectory;
+- annual physical/economic/emissions summary;
+- Golden Case v2.
 
 ### Preserved
 
-- Golden Case v1 remains frozen with `model_version=0.1.0` and `case_version=golden-v1`;
-- dataset version remains `demo-v1` because the three hourly CSV datasets are unchanged;
-- core runtime remains offline with no HTTP/API calls.
+- Golden Case v1;
+- `demo-v1` datasets;
+- offline runtime.
 
-### Explicitly not included
-
-Mathematical optimization, price-arbitrage dispatch, degradation, sensitivity analysis, Streamlit UI and the Castellón ceramic case.
-
-## 0.1.0 — Iteration 1 Energy Engine
+## 0.1.0 — Iteration 1: Energy Engine
 
 ### Added
 
 - package structure and version identifiers;
-- strict normalized hourly dataset validation;
-- deterministic 8,760-hour synthetic demo datasets and metadata;
-- grid-only baseline energy balance;
-- annual consumption and hourly-price cost calculation;
-- emissions, reduction and abatement-cost helpers;
-- NPV, simple payback and capital-recovery-factor helpers;
-- unit, integration and golden regression test structure;
-- GitHub Actions CI definition;
-- initial README, methodology, assumptions and future-scope documentation.
+- strict hourly dataset validation;
+- deterministic 8,760-hour synthetic demo datasets;
+- grid-only baseline;
+- annual energy/cost/emissions calculations;
+- NPV, payback and CRF helpers;
+- tests, CI definition and initial documentation.
