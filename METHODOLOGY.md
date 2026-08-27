@@ -434,3 +434,34 @@ The interface deliberately distinguishes:
 - **calculated result** — an output produced by the engine.
 
 Important inputs and outputs receive educational help from the centralized metric registry. The help describes what a quantity is, its units, why it matters, its calculation, interpretation, relationships and material caveats. The UI does not use generative AI to explain results.
+
+
+---
+
+# v1.0 representative-case methodology
+
+The optimization equations remain model version **0.3.0**. The v1.0 application adds a public-data-calibrated case layer without changing the mathematical model.
+
+## Evidence classes
+
+Case inputs explicitly distinguish published sector/official data, derived public values, proxies and model assumptions. The complete transformation/provenance chain is stored in `cases/ceramic_castellon/sources.json`.
+
+## Representative load
+
+The Castellón case uses a 15,000 MWh/year rounded representative scale. The deterministic hourly shape is a modelling assumption and is rescaled exactly to the annual total. It is not a measured factory profile.
+
+## Price proxy
+
+The hourly price series is calibrated to 2025 OMIE day-ahead statistics and is treated only as a wholesale energy-price proxy. It excludes network charges, taxes, contracted-power terms, supplier margins and hedging.
+
+## Solar profile
+
+PVGIS 5.3 is the official methodology reference. The committed v1 series is a deterministic profile calibrated to documented PVGIS-derived Castelló monthly yield values, not raw PVGIS hourly data.
+
+## Grid-emission factor
+
+The case factor is transparently derived from Red Eléctrica 2025 national generation emissions divided by national electricity generation. It remains constant over all 8,760 hours; exports receive no carbon credit.
+
+## Interpretation boundary
+
+The ceramic case models only the electrical subsystem. No claim is made about total ceramic-process decarbonization because kilns, dryers, natural-gas consumption and other thermal processes are outside v1.

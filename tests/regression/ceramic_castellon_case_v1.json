@@ -1,0 +1,37 @@
+{
+  "case_version": "ceramic-castellon-v1",
+  "dataset_version": "ceramic-castellon-2025-v1",
+  "model_version": "0.3.0",
+  "annual_load_mwh": 14999.999999999985,
+  "baseline_energy_component_cost_eur": 983365.8876259539,
+  "baseline_grid_emissions_tco2": 1625.6270182695307,
+  "economic_optimum": {
+    "status": "optimal",
+    "pv_capacity_kw": 2971.594180340974,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "objective_annualized_cost_eur": 880203.2083583749,
+    "grid_import_mwh": 10440.934190745014,
+    "grid_export_mwh": 245.40766148465582,
+    "initial_capex_eur": 2080115.926238682,
+    "project_npv_eur": 522604.2491271345,
+    "simple_payback_years": 8.295510288998381,
+    "scenario_emissions_tco2": 1131.5376477632822,
+    "emissions_reduction_fraction": 0.30393772061699825,
+    "abatement_cost_eur_per_tco2": -208.79356129818692
+  },
+  "carbon_target_40pct": {
+    "status": "optimal",
+    "pv_capacity_kw": 4245.649045567246,
+    "battery_energy_capacity_kwh": 2460.394774299123,
+    "battery_power_capacity_kw": 568.3191005569669,
+    "annualized_cost_eur": 927345.6918050916,
+    "grid_import_mwh": 8999.999999999958,
+    "grid_export_mwh": 791.332858706211,
+    "initial_capex_eur": 3630647.3697956977,
+    "emissions_tco2": 975.376210961715,
+    "emissions_reduction_fraction": 0.40000000000000213,
+    "abatement_cost_eur_per_tco2": -86.15167438668549,
+    "carbon_constraint_binding": true
+  }
+}

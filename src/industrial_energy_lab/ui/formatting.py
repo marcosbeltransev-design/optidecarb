@@ -2,6 +2,18 @@
 from __future__ import annotations
 
 from industrial_energy_lab.explainability.metrics import get_metric
+from industrial_energy_lab.explainability.glossary import get_term
+
+METRIC_GLOSSARY_TERMS = {
+    "pv_capacity": "pv", "pv_generation": "pv", "pv_capex": "capex",
+    "battery_capex": "capex", "opex": "opex", "annualized_capex": "annualized_capex",
+    "crf": "crf", "wacc": "wacc", "npv": "npv", "payback": "payback",
+    "soc": "soc", "self_consumption_ratio": "self_consumption",
+    "self_sufficiency_ratio": "self_sufficiency", "abatement_cost": "abatement_cost",
+    "economic_optimum": "objective_function", "objective_function": "objective_function",
+    "binding_carbon_constraint": "binding", "infeasible_scenario": "infeasible",
+    "carbon_target": "carbon_target",
+}
 
 ASSUMPTION_METRICS = {
     "import_price_multiplier", "export_price", "pv_capex_rate", "pv_opex_rate",
@@ -16,16 +28,22 @@ def metric_help(metric_id: str) -> str:
     """Render the central metric definition as compact Markdown help text."""
     metric = get_metric(metric_id)
     related = ", ".join(get_metric(i).label for i in metric.relationships) or "None"
-    parts = [
+    parts = []
+    glossary_id = METRIC_GLOSSARY_TERMS.get(metric_id)
+    if glossary_id:
+        term = get_term(glossary_id)
+        parts.append(f"**{term.term} — {term.full_name}**")
+        parts.append(term.plain_language_definition)
+    parts.extend([
         metric.short_description,
         f"**Unit:** {metric.unit}",
         f"**Why it matters:** {metric.why_it_matters}",
         f"**How it is calculated:** {metric.calculation}",
         f"**How to interpret it:** {metric.interpretation}",
         f"**Related:** {related}",
-    ]
+    ])
     if metric_id in ASSUMPTION_METRICS:
-        parts.append("**Source:** Synthetic assumption for model validation until a sourced case replaces it.")
+        parts.append("**Source:** Active-case provenance is appended by the UI when available; synthetic-demo values are software-validation assumptions.")
     if metric.caveats:
         parts.append(f"**Important limitation:** {metric.caveats}")
     return "\n\n".join(parts)

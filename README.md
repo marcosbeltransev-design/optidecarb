@@ -2,259 +2,343 @@
 
 **Industrial Decarbonization & Techno-Economic Screening**
 
-Industrial Energy Lab is an offline-first Python pre-feasibility tool for industrial electrical-energy systems. Its v1 scope is intentionally narrow: 8,760-hour load modelling, PV, battery storage, grid exchange, transparent economics, grid-related CO2 accounting, linear optimization, deterministic sensitivity analysis, and a later representative ceramic-industry case for Castellón, Spain.
+Industrial Energy Lab (IEL) is an offline-first Python **pre-feasibility** tool for industrial **electrical** decarbonization. It combines validated 8,760-hour energy balances, photovoltaic (PV) generation, battery storage, grid exchange, transparent economics, linear programming (LP), carbon constraints, deterministic sensitivity analysis, explainability, and a public-data-calibrated representative ceramic-industry case for Castellón, Spain.
 
-> **Status:** Iterations 1–3 are frozen and regression-tested with Golden Cases v1–v3. Iteration 4 has a frozen v0.4 Streamlit implementation: professional navigation, validated inputs, baseline/optimization/economics/hourly/carbon/sensitivity views, and centralized educational help. Local code QA passes; native Streamlit AppTest/browser verification and public deployment remain external acceptance checks because this sandbox cannot install Streamlit and no standalone GitHub remote is currently available. The sourced Castellón ceramic case remains Iteration 5.
+> **v1.0 scope:** electricity + PV + battery + grid. Thermal process energy, kilns, dryers and natural-gas consumption are outside the model boundary.
+
+> **Case disclaimer:** The Castellón representative case is constructed from public sector data and explicit modelling assumptions. It does not reproduce the operations, costs or energy consumption of any individual ceramic company.
 
 ## What problem does it solve?
 
-The v1 screening question is:
+> Given an industrial hourly electricity demand profile, what PV and battery configuration minimizes equivalent annual energy-system cost, and how does that solution change under explicit CO₂-reduction targets?
 
-> Given an industrial site's annual hourly electricity profile, what PV and battery configuration minimizes equivalent annual energy-system cost, and how does that solution change under explicit CO2-reduction targets?
+IEL jointly chooses:
 
-The optimizer jointly chooses:
-
-- PV capacity [kW];
-- battery energy capacity [kWh];
-- battery power capacity [kW];
+- PV capacity [kW/MW];
+- battery energy capacity [kWh/MWh];
+- battery power capacity [kW/MW];
 - hourly PV allocation;
 - hourly battery charge/discharge;
-- hourly SOC;
-- residual grid import/export.
+- hourly state of charge (SOC).
 
-The objective minimizes **total annualized cost**, while project NPV and simple payback are calculated afterwards as complementary investment indicators.
+Grid imports and PV exports are calculated consistently from hourly residual balances. The optimizer minimizes **total annualized cost**. Net present value (NPV) and simple payback are calculated afterwards as complementary screening indicators.
 
-## What it does **not** claim
+## New to energy optimization?
 
-This is not detailed engineering, FEED, a certified energy model, financial advice, an industrial control system, a universal energy-system simulator, or a digital twin. All current demo economics and profiles are synthetic software-validation assumptions and must not be interpreted as current market quotes or measurements from a real factory.
+Start here:
+
+- [`docs/BEGINNER_GUIDE.md`](docs/BEGINNER_GUIDE.md) — power vs energy, PV, batteries, economics, optimization and carbon from zero;
+- [`docs/OPTIMIZATION_GUIDE.md`](docs/OPTIMIZATION_GUIDE.md) — the LP formulation in engineering language;
+- [`docs/INTERVIEW_GUIDE.md`](docs/INTERVIEW_GUIDE.md) — short/deeper answers to common technical interview questions;
+- [`cases/ceramic_castellon/CASE_STUDY.md`](cases/ceramic_castellon/CASE_STUDY.md) — the complete representative Castellón case.
+
+The Streamlit interface also exposes a **Learning mode** plus contextual `?` help for important inputs/results. Definitions come from one central explainability registry, not duplicated page text.
+
+## How IEL works
+
+```text
+PUBLIC DATA + EXPLICIT ASSUMPTIONS
+                |
+                v
+           VALIDATION
+                |
+                v
+      REPRESENTATIVE 8,760h CASE
+                |
+                v
+             BASELINE
+                |
+                v
+        PV + BATTERY PHYSICS
+                |
+                v
+          LP OPTIMIZATION
+          /      |       \
+     ECONOMICS  CARBON  SENSITIVITY
+          \      |       /
+                v
+          INTERPRETATION
+```
+
+The core and optimizer do not call HTTP/APIs. External research is converted into traceable offline case snapshots before runtime.
+
+## Why 8,760 hours?
+
+A non-leap year has `24 × 365 = 8,760` hours. Hourly modeling preserves:
+
+- load/PV coincidence;
+- battery state of charge;
+- charge/discharge timing;
+- hourly electricity-price exposure;
+- PV export versus onsite use.
+
+The UI may display one week, but the optimizer still solves the complete validated annual timeline.
+
+## Key terminology
+
+- **MW** = power (rate); **MWh** = energy (quantity). `1 MW × 1 h = 1 MWh`.
+- **CAPEX — Capital Expenditure** = upfront investment.
+- **OPEX — Operating Expenditure** = recurring operating expenditure.
+- **WACC — Weighted Average Cost of Capital** = financing/discount rate used for annualization and NPV.
+- **CRF — Capital Recovery Factor** = factor converting upfront CAPEX into equivalent annual cost.
+- **SOC — State of Charge** = energy currently stored in the battery.
+- **LP — Linear Programming** = method used to minimize annualized cost while respecting linear constraints.
+- **Proxy** = transparent approximation used when exact plant-specific data are unavailable.
+
+See the Beginner Guide and in-app glossary for examples and common confusions.
 
 ## Architecture
 
 ```text
-external data sources (future adapters)
+adapters / public research
         |
         v
-versioned offline datasets
+versioned offline snapshots + provenance
         |
         v
-8,760h physical engine
-  |       |       |
- load     PV    battery
-          |       |
-          +-- physical balances --+
-                                  |
-                                  v
-                         economics + CO2
-                                  |
-                                  v
-                       linear optimization
-                         |      |       |
-                       sizing  carbon  sensitivity
-                                  |
-                                  v
-                         explainability registry
-                                  |
-                                  v
-                        Streamlit UI (Iteration 4)
+case bundles
+        |
+        +--> core/          physical simulation
+        +--> economics/     cost/NPV/payback
+        +--> optimization/  sparse 8,760h LP + carbon + sensitivity
+        +--> explainability/ metric registry + glossary + rule-based insights
+        +--> ui/            Streamlit orchestration/presentation only
 ```
 
-`core/`, `optimization/` and `explainability/` make no HTTP/API calls. Runtime calculations consume local snapshots.
+The UI does not reimplement engineering equations.
 
-## Implemented features
+## v1 features
 
-### Iteration 1 — frozen baseline
+### Physical model
 
-- strict 8,760-hour UTC dataset validation;
-- deterministic synthetic industrial load and hourly electricity prices;
-- exact grid-only baseline;
-- annual consumption, cost and grid-related CO2;
-- NPV, simple payback and CRF helpers;
-- Golden Case v1.
+- strict 8,760-hour UTC validation;
+- industrial electricity load;
+- PV normalized capacity-factor profile;
+- battery energy and power limits;
+- charge/discharge efficiencies and explicit losses;
+- state-of-charge bounds;
+- deterministic PV-first simulator;
+- self-consumption and self-sufficiency;
+- grid import/export.
 
-### Iteration 2 — physical PV + battery simulation
+### Optimization
 
-- PV generation from installed capacity and normalized hourly capacity factor;
-- battery energy/power limits, charge/discharge efficiency and SOC bounds;
-- deterministic PV-first dispatch;
-- PV direct use, PV-to-battery, battery-to-load and PV export;
-- grid import/export and explicit battery losses;
-- self-consumption and self-sufficiency metrics;
-- scenario operating economics and emissions;
-- Golden Case v2.
-
-### Iteration 3 — optimization, carbon and explainability
-
-- 8,760-hour linear-programming sizing and dispatch;
-- optimal PV capacity, battery energy and battery power;
+- continuous sparse LP solved with HiGHS through SciPy `linprog`;
+- optimal PV capacity;
+- optimal battery energy capacity;
+- optimal battery power capacity;
+- hourly dispatch;
+- PV-only battery charging in v1;
 - cyclic annual SOC boundary;
-- battery charging restricted to PV allocation, not grid arbitrage;
-- residual grid import/export formulation with no redundant import/export variables;
-- explicit model bounds for site feasibility and numerical robustness;
-- total annualized cost objective;
-- technology-specific CRFs and OPEX;
-- post-processed project NPV and simple payback;
-- optional minimum CO2-reduction constraint;
-- solver states: `optimal`, `infeasible`, `unbounded`, `solver_error`;
-- cost-decarbonization frontier (0/10/20/30/40/50% by default);
-- deterministic one-at-a-time sensitivity analysis;
-- on-demand sensitivity-family execution for interactive use;
-- battery CAPEX break-even scan support;
-- 58-metric explainability registry used by Streamlit help controls;
-- deterministic result-based insights without generative AI;
-- Golden Case v3 and binding-carbon regression.
+- site/model capacity bounds;
+- normalized solver statuses;
+- no material simultaneous charge/discharge or import/export in validated results.
 
+### Economics
 
-### Iteration 4 — Streamlit engineering interface
+- initial CAPEX;
+- technology-specific annualized CAPEX using CRF;
+- OPEX;
+- grid purchase cost;
+- export revenue;
+- total annualized system cost;
+- equivalent annual saving versus baseline;
+- simplified project NPV;
+- simple payback.
 
-- nine-section engineering UI: Overview, Inputs, Baseline, Optimized system, Hourly results, Economics, Decarbonization, Sensitivity and Methodology;
-- `st.form`-based input workflow so editing assumptions does not repeatedly solve the annual LP;
-- session-state storage only for current inputs/results, with no database or backend;
-- native Streamlit help controls driven by the centralized explainability registry;
-- explicit synthetic-assumption/source messaging for demo inputs;
-- validated optional 8,760-hour load CSV upload aligned to the current PV/price timeline;
-- rule-based “Why this solution?” explanations;
-- Plotly load-duration, monthly-consumption, hourly-energy, SOC, economics, carbon-frontier and sensitivity charts;
-- friendly infeasible/solver error handling with optional technical details;
-- carbon-frontier solves only targets stricter than the economic optimum;
-- sensitivity is one family at a time, on demand;
-- Streamlit AppTest smoke test included in CI and skipped only when the optional Streamlit dependency is absent locally.
+### Carbon
 
-The UI contains orchestration and presentation only. All engineering calculations still come from `core/`, `economics/` and `optimization/`.
+- constant explicit grid-emission factor;
+- no export CO₂ credit;
+- optional minimum CO₂-reduction target;
+- binding/non-binding detection;
+- infeasibility handling;
+- abatement cost;
+- cost-decarbonization frontier.
 
-## Solver backend
+### Sensitivity
 
-Iteration 3 is formulated as a sparse LP and solved with **HiGHS through SciPy `linprog`**:
+Deterministic, one-at-a-time, **on-demand** families:
 
-- HiGHS dual simplex for unconstrained economic sizing;
-- HiGHS interior-point for explicit carbon-constrained annual problems.
+- electricity price;
+- PV CAPEX;
+- battery CAPEX;
+- WACC;
+- grid-emission factor;
+- carbon target.
 
-Pyomo + HiGHS was the original preferred stack. In the current build environment, new Pyomo/highspy packages could not be installed, while SciPy already exposed a working HiGHS backend. Using SciPy preserves the essential open-source HiGHS solver, keeps the formulation linear/offline, reduces dependencies, and is fully tested. The optimization layer is kept separate so a future Pyomo adapter could be added without changing the physical/economic conventions if it ever adds concrete value.
+IEL intentionally does not run every sensitivity family on every UI rerun.
 
-## Golden Case v3 — synthetic optimization case
+### Explainability
 
-All inputs below are **ASSUMPTION / SOFTWARE VALIDATION ONLY**.
+- centralized metric registry;
+- centralized beginner glossary;
+- acronym expansion;
+- definitions, units, formulas, interpretations, relationships and caveats;
+- source/provenance context for case inputs;
+- deterministic “Why this solution?” insights;
+- no generative-AI dependency.
 
-Economic optimum:
+## Representative Ceramic Plant — Castellón
 
-- annual load: **22,000 MWh**;
-- PV: **4.088 MW**;
-- battery: **0 MWh / 0 MW**;
-- total annualized cost: **€1.750 million/year**;
-- equivalent annual saving vs baseline: **€218.6k/year**;
-- grid-import reduction / modeled CO2 reduction: **33.4%**;
-- project NPV under the simplified 15-year post-processing model: **+€0.546 million**.
+The default v1 showcase is **`ceramic-castellon-v1`**, a public-data-calibrated representative electrical case with reference year 2025.
 
-40% minimum CO2 reduction:
+### Evidence chain
 
-- PV: **5.210 MW**;
-- battery: **2.596 MWh / 0.493 MW**;
-- carbon constraint: **binding**;
-- total annualized cost: **€1.774 million/year**;
-- modeled reduction: **40.0%**.
+- **ASCER:** ceramic-sector production/energy context and Castellón cluster concentration;
+- **OMIE:** 2025 Spanish day-ahead market-price calibration; treated as a wholesale energy-price proxy, not an industrial bill;
+- **PVGIS/JRC methodology:** solar-resource reference; v1 commits a deterministic PVGIS-calibrated profile rather than claiming raw hourly PVGIS data;
+- **Red Eléctrica:** Spanish 2025 generation/emissions used to derive the grid-emission factor;
+- **IDAE:** Spanish screening ranges for PV/storage cost reasonableness;
+- **IRENA:** international/European cost cross-check.
 
-This contrast is deliberate: it demonstrates that storage can be absent from the pure economic optimum but enter when a stricter decarbonization requirement changes the feasible solution.
+Every external value, proxy, derived value and assumption is traceable in [`cases/ceramic_castellon/sources.json`](cases/ceramic_castellon/sources.json).
 
-## Cost-decarbonization frontier — Golden Case v3 assumptions
+### Representative scale
 
-| Minimum CO2 reduction | PV MW | Battery MWh | Battery MW | Annualized cost M€/y | Binding? |
+The case uses **15,000 MWh/year**. It is a rounded representative scale consistent with public sector order of magnitude — **not** “the average Castellón ceramic factory.”
+
+### Frozen economic optimum
+
+| Metric | Result |
+|---|---:|
+| Annual load | 15,000 MWh/year |
+| Baseline modeled energy cost | €983,366/year |
+| Baseline grid emissions | 1,625.6 tCO₂eq/year |
+| Optimal PV | 2.972 MW |
+| Optimal battery | 0 MWh / 0 MW |
+| PV generation | 4,804 MWh/year |
+| PV self-consumption | 94.9% |
+| Electrical self-sufficiency | 30.4% |
+| Grid imports | 10,441 MWh/year |
+| Initial CAPEX | €2.080 M |
+| Annualized system cost | €880,203/year |
+| Equivalent annual improvement | €103,163/year |
+| Simplified NPV | +€522,604 |
+| Simple payback | 8.30 years |
+| CO₂ reduction | 30.4% |
+| Abatement cost | -€208.8/tCO₂ |
+
+Battery = 0 is a valid result. The model does not force every available technology into the solution.
+
+### Cost-decarbonization frontier
+
+| Minimum CO₂ reduction | PV MW | Battery MWh | Battery MW | Annualized cost €/y | Binding? |
 |---:|---:|---:|---:|---:|:---:|
-| 0% | 4.09 | 0.00 | 0.00 | 1.750 | No |
-| 10% | 4.09 | 0.00 | 0.00 | 1.750 | No |
-| 20% | 4.09 | 0.00 | 0.00 | 1.750 | No |
-| 30% | 4.09 | 0.00 | 0.00 | 1.750 | No |
-| 40% | 5.21 | 2.60 | 0.49 | 1.774 | Yes |
-| 50% | 6.61 | 9.42 | 1.59 | 1.836 | Yes |
+| 0% | 2.97 | 0.00 | 0.00 | 880,203 | No |
+| 10% | 2.97 | 0.00 | 0.00 | 880,203 | No |
+| 20% | 2.97 | 0.00 | 0.00 | 880,203 | No |
+| 30% | 2.97 | 0.00 | 0.00 | 880,203 | No |
+| 40% | 4.25 | 2.46 | 0.57 | 927,346 | Yes |
+| 50% | 5.34 | 6.83 | 1.45 | 1,007,628 | Yes |
 
-Targets already met by the unconstrained economic optimum reuse that mathematically identical solution instead of re-solving the annual LP.
+The unconstrained economic optimum already reduces modeled electrical CO₂ by ~30.4%. Therefore 10–30% targets do not alter the solution. The 40% target is binding and storage enters.
 
-## Explainability and `?` controls
+Read the case study for the evidence, formulas, sensitivity and limitations behind these numbers.
 
-`src/industrial_energy_lab/explainability/metrics.py` is the single source of truth for UI help icons. Each important metric contains:
+## Streamlit interface
 
-- label and unit;
-- plain-language definition;
-- why it matters;
-- calculation/formula;
-- interpretation;
-- relationships with other metrics;
-- caveats.
+Nine sections:
 
-The Iteration 4 interface renders that metadata beside important inputs and metric cards through Streamlit help controls. Explanations are not duplicated across pages.
+1. Overview
+2. Inputs
+3. Baseline
+4. Optimized system
+5. Hourly results
+6. Economics
+7. Decarbonization
+8. Sensitivity
+9. Methodology & learning
 
-`insights.py` adds deterministic result-driven statements such as whether a carbon constraint is binding, whether optimal storage is zero, how capacities change between two solved scenarios, and whether modeled abatement cost is positive or negative.
+Inputs use `st.form`, so editing a value does not repeatedly trigger the 8,760-hour optimizer.
+
+The case selector provides:
+
+- **Representative Ceramic Plant — Castellón** (default showcase);
+- **Synthetic software demo** (regression/education reference).
 
 ## Installation
 
 Python 3.11+:
 
 ```bash
-git clone <repository-url>
-cd industrial-energy-lab
 python -m venv .venv
-# Linux/macOS: source .venv/bin/activate
-# Windows: .venv\Scripts\activate
+# Linux/macOS
+source .venv/bin/activate
+# Windows
+# .venv\Scripts\activate
+
 python -m pip install -e ".[dev,app]"
 ```
 
-## Reproduce the demo datasets
+Engine-only installation:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+## Reproduce datasets
 
 ```bash
 python scripts/generate_demo_data.py
+python scripts/build_ceramic_castellon_case.py
 ```
 
-The generator uses seed `20260827` and creates exactly 8,760 UTC hours.
+The ceramic builder produces deterministic offline snapshots and metadata.
 
-## Run the models
+## Run models
 
 ```bash
 python scripts/run_baseline.py
 python scripts/run_scenario.py
 python scripts/run_optimization.py
+python scripts/run_ceramic_castellon_case.py
 ```
 
-## Run the Streamlit interface
+## Run web app
 
 ```bash
 streamlit run app.py
 ```
 
-The app dependency is pinned to Streamlit 1.62.0 for reproducible Iteration 4 validation.
-
-## Run validation
+## Validation
 
 ```bash
 python -m compileall -q src scripts tests
 pytest
 ```
 
-## Data/time policy
+Golden Cases v1–v3 protect the synthetic engine history. `ceramic_castellon_case_v1.json` freezes the sourced representative case separately.
 
-Engine input is normalized to exactly 8,760 uninterrupted UTC hours. Leap-year and local-DST data must be normalized before entering the engine. Duplicate, missing or non-hourly timestamps fail validation.
+## Versioning
 
-## Documentation
+- application/package: **v1.0.0**;
+- optimization model: **v0.3.0**;
+- representative case: **ceramic-castellon-v1**;
+- representative dataset: **ceramic-castellon-2025-v1**.
 
-- `METHODOLOGY.md` — physical/economic/LP equations and conventions.
-- `ASSUMPTIONS.md` — explicit synthetic assumptions and limitations.
-- `docs/OPTIMIZATION_GUIDE.md` — pedagogical introduction to the optimization model.
-- `docs/ARCHITECTURE.md` — architecture decisions.
-- `FUTURE_IDEAS.md` — deferred scope.
-- `CHANGELOG.md` — model changes.
+The model version remains 0.3.0 because Iteration 5 adds data, case integration and education rather than new optimization equations.
 
-## Roadmap
+## Important limitations
 
-1. **Energy Engine** — complete/frozen.
-2. **8,760h + PV + Battery** — complete/frozen.
-3. **Optimization** — complete/frozen after v0.3 validation.
-4. **Streamlit Web** — v0.4 implementation frozen; native Streamlit/browser/deployment acceptance remains pending in an installable runtime with a standalone GitHub remote.
-5. **Castellón Ceramic Case** — sourced representative case study.
+IEL v1 does **not** model:
 
-After Iteration 5, v1.0 is considered complete. Any thermal or hydrogen extension requires an explicit product decision.
+- ceramic thermal-process energy, kilns, dryers or natural gas;
+- plant-specific measured data or contracts;
+- full industrial tariffs, network charges, demand charges or taxes;
+- PV/battery degradation and replacement;
+- taxes, depreciation, salvage value or detailed financing;
+- hourly grid-emission factors;
+- grid-to-battery arbitrage;
+- stochastic uncertainty;
+- detailed engineering, interconnection, structural studies or permitting.
+
+These limits are intentional. **Depth, traceability and a finished v1 are preferred to uncontrolled scope growth.**
+
+## CV-ready description
+
+> Developed a Python techno-economic screening tool for industrial electrical decarbonization, combining 8,760-hour energy modelling, linear PV/battery sizing optimization, carbon constraints, NPV and sensitivity analysis, explainability, and a public-data-calibrated ceramic-industry case study for Castellón, Spain.
 
 ## License
 
-MIT for project code and project-generated synthetic demo data. External datasets added later must retain their own source/license metadata.
-
-
-### Iteration 4 validation boundary
-
-The v0.4 implementation, service-layer tests, explainability checks, dependency manifest and CI smoke test are complete and frozen. In this sandbox, 66 tests pass and the single native Streamlit `AppTest` is skipped only because the optional Streamlit package cannot be downloaded. Visual browser verification, screenshots and Community Cloud deployment require an installable Streamlit runtime plus a standalone GitHub remote. These are deployment acceptance checks, not unfinished engine/UI implementation.
+MIT. External source data remain subject to their respective source terms; IEL stores provenance and calibrated/derived case values rather than claiming ownership of external datasets.
