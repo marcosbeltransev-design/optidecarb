@@ -1,0 +1,8 @@
+{
+  "status": "ASSUMPTION / SOFTWARE VALIDATION ONLY",
+  "grid_emissions_factor_kg_co2_per_mwh": 180.0,
+  "note": "This value is intentionally synthetic in Iteration 1 and is not presented as a current Spanish grid factor.",
+  "model_version": "0.1.0",
+  "dataset_version": "demo-v1",
+  "case_version": "golden-v1"
+}

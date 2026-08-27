@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Compile Python
+        run: python -m compileall -q src scripts tests
+      - name: Validate reproducible datasets
+        run: |
+          cp data/demo/industrial_load_8760.csv /tmp/load.csv
+          cp data/demo/electricity_prices_8760.csv /tmp/prices.csv
+          cp data/demo/pv_profile_8760.csv /tmp/pv.csv
+          python scripts/generate_demo_data.py
+          cmp data/demo/industrial_load_8760.csv /tmp/load.csv
+          cmp data/demo/electricity_prices_8760.csv /tmp/prices.csv
+          cmp data/demo/pv_profile_8760.csv /tmp/pv.csv
+      - name: Test
+        run: pytest
