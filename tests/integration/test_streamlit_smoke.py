@@ -16,4 +16,5 @@ def test_streamlit_app_starts_and_navigation_is_present():
     options = list(at.radio[0].options)
     assert "Inputs" in options
     assert "Sensitivity" in options
+    assert "Learning Lab" in options
     assert "Methodology" in options

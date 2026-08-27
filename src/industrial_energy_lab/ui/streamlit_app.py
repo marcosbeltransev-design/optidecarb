@@ -18,8 +18,23 @@ from industrial_energy_lab.explainability.insights import (
     explain_scenario_change,
     explain_sensitivity_results,
 )
+from industrial_energy_lab.explainability.calculations import explain_calculation
 from industrial_energy_lab.explainability.metrics import get_metric
 from industrial_energy_lab.explainability.glossary import GLOSSARY, get_term, term_help
+from industrial_energy_lab.learning import (
+    CASTELLON_WALKTHROUGH,
+    COMMON_TRAPS,
+    CONCEPT_DEPENDENCIES,
+    GUIDED_EXPERIMENTS,
+    LEARNING_PATH,
+    QUESTIONS,
+    TERM_DIFFICULTY,
+    battery_duration_hours,
+    crf_learning_example,
+    energy_balance_residual_kwh,
+    explain_dispatch_hour,
+    three_hour_battery_lab,
+)
 from industrial_energy_lab.optimization.sensitivity import SENSITIVITY_FAMILIES
 from industrial_energy_lab.ui import APP_VERSION
 from industrial_energy_lab.ui.charts import (
@@ -54,6 +69,7 @@ from industrial_energy_lab.ui.services import (
     validate_custom_load,
     parameter_provenance_help,
 )
+from industrial_energy_lab.ui.learning_services import run_guided_experiment
 from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
 SECTIONS = (
@@ -65,6 +81,7 @@ SECTIONS = (
     "Economics",
     "Decarbonization",
     "Sensitivity",
+    "Learning Lab",
     "Methodology",
 )
 
@@ -90,6 +107,8 @@ def _state_defaults(st) -> None:
         "frontier": None,
         "sensitivity_results": {},
         "learning_mode": True,
+        "learning_experiment_runs": {},
+        "student_progress": [],
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -151,6 +170,22 @@ def _result_error(st, result) -> None:
 def _metric(st, metric_id: str, value: str, *, delta: str | None = None) -> None:
     m = get_metric(metric_id)
     st.metric(m.label, value, delta=delta, help=_help(st, metric_id), border=True)
+
+
+def _worked_calculation(st, metric_id: str, result) -> None:
+    """Render one traceable formula using the active solved result."""
+    if not st.session_state.get("learning_mode", True):
+        return
+    try:
+        calc = explain_calculation(metric_id, result, st.session_state.params)
+    except (KeyError, ValueError):
+        return
+    with st.expander(f"Show calculation — {calc.label}"):
+        st.markdown(f"**Formula**  \n`{calc.formula}`")
+        st.markdown(f"**Using this scenario**  \n`{calc.substitution}`")
+        if calc.unit_check:
+            st.caption(f"Unit check: {calc.unit_check}")
+        st.info(calc.interpretation)
 
 
 def _run_current_optimization(st, *, target: float | None = None) -> None:
@@ -407,6 +442,8 @@ def _optimized(st) -> None:
     with row2[0]: _metric(st, "scenario_cost", format_eur_per_year(result.objective_annualized_cost_eur))
     with row2[1]: _metric(st, "annual_saving", format_eur_per_year(result.annual_saving_vs_baseline_eur))
     with row2[2]: _metric(st, "co2_reduction_fraction", format_percent(result.emissions_reduction_fraction))
+    _worked_calculation(st, "annual_saving", result)
+    _worked_calculation(st, "co2_reduction_fraction", result)
     if target > 0:
         _metric(
             st,
@@ -461,6 +498,25 @@ def _hourly(st) -> None:
     st.subheader("Battery state of charge")
     st.caption(_help(st, "soc"))
     st.plotly_chart(soc_chart(dispatch, result.battery_energy_capacity_kwh, start=start, hours=hours), use_container_width=True)
+    if st.session_state.get("learning_mode", True):
+        st.subheader("Explain this hour")
+        selected_hour = st.number_input(
+            "Hour index", min_value=0, max_value=n - 1, value=min(start, n - 1), step=1,
+            help="Choose one solved hour and inspect how load, PV, battery and grid balance.",
+        )
+        row = dispatch.iloc[int(selected_hour)]
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: st.metric("Load", f"{row['load_kwh']:.2f} kWh")
+        with c2: st.metric("PV", f"{row['pv_generation_kwh']:.2f} kWh")
+        with c3: st.metric("Grid import", f"{row['grid_import_kwh']:.2f} kWh")
+        with c4: st.metric("SOC end", f"{row['soc_kwh']:.2f} kWh")
+        for sentence in explain_dispatch_hour(row):
+            st.write(f"- {sentence}")
+        residual = energy_balance_residual_kwh(row)
+        st.caption(
+            f"Energy-balance residual: {residual:.3e} kWh. "
+            "PV + grid + SOC start = load + export + battery losses + SOC end."
+        )
 
 
 def _economics(st) -> None:
@@ -471,6 +527,7 @@ def _economics(st) -> None:
         return
     st.subheader("Initial investment")
     _metric(st, "initial_capex", format_eur(r.initial_capex_eur))
+    _worked_calculation(st, "initial_capex", r)
     st.subheader("Annualized economics")
     c1, c2, c3 = st.columns(3)
     with c1: _metric(st, "scenario_cost", format_eur_per_year(r.objective_annualized_cost_eur))
@@ -479,6 +536,10 @@ def _economics(st) -> None:
     c1, c2 = st.columns(2)
     with c1: _metric(st, "npv", format_eur(r.project_npv_eur))
     with c2: _metric(st, "payback", format_years(r.simple_payback_years))
+    _worked_calculation(st, "crf", r)
+    _worked_calculation(st, "annualized_capex", r)
+    _worked_calculation(st, "npv", r)
+    _worked_calculation(st, "payback", r)
     st.plotly_chart(economics_breakdown(r), use_container_width=True)
     st.caption("NPV and payback are screening indicators under the configured simplified cash-flow assumptions; they are not an investment recommendation.")
 
@@ -546,6 +607,232 @@ def _sensitivity(st) -> None:
         st.info(text + " This statement is derived from solved results, not generated by an AI model.")
 
 
+def _learning_lab(st) -> None:
+    st.header("Student Learning Lab")
+    st.write(
+        "Learn by **predicting, experimenting and explaining**. Small examples are used for foundations; "
+        "the full 8,760-hour model is only run when you explicitly launch a guided experiment."
+    )
+    st.caption("No scores, accounts or AI-generated explanations. Your answers live only in this browser session.")
+
+    modules = [name.title() for name, _ in LEARNING_PATH]
+    module = st.radio("Learning module", modules, horizontal=True)
+    progress = set(st.session_state.get("student_progress", []))
+    st.caption("Progress this session: " + " · ".join(f"{name} {'✓' if name in progress else '—'}" for name in modules))
+
+    if module == "Foundations":
+        st.subheader("1 — Power, energy and 8,760 hours")
+        st.markdown(term_help("power"))
+        st.markdown(term_help("energy"))
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown("**Unit check**")
+            st.code("5 MW × 3 h = 15 MWh")
+            st.write("MW is a rate. Multiplying by time gives an energy quantity in MWh.")
+        with c2:
+            st.markdown("**Battery duration**")
+            duration = battery_duration_hours(4.0, 2.0)
+            st.code(f"4 MWh / 2 MW = {duration:.0f} h")
+            st.write("This ignores efficiency and SOC limits; it is a first-order engineering check.")
+        with st.expander("Why exactly 8,760 hours?"):
+            st.markdown(term_help("hours8760"))
+            st.write("Charts may show one week for readability, but annual optimization still uses every hour.")
+        st.subheader("Common engineering traps")
+        for wrong, correct in COMMON_TRAPS[:4]:
+            st.write(f"- ❌ **{wrong}** → ✅ {correct}")
+
+    elif module == "Energy System":
+        st.subheader("2 — PV, battery and hourly balance")
+        st.write("A battery has two independent dimensions: **MW** tells you how fast it can charge/discharge; **MWh** tells you how much it can store.")
+        d = three_hour_battery_lab().copy()
+        d["hour"] = [1, 2, 3]
+        st.dataframe(d[["hour", "load_kwh", "pv_generation_kwh", "battery_charge_kwh", "battery_discharge_kwh", "soc_kwh", "grid_import_kwh", "battery_losses_kwh"]], use_container_width=True, hide_index=True)
+        st.markdown(
+            "**Manual story:** hour 2 has 10 kWh PV surplus. At 90% charge efficiency it adds 9 kWh to SOC. "
+            "At hour 3, 9 kWh stored can deliver 8.1 kWh at 90% discharge efficiency, leaving 1.9 kWh for the grid."
+        )
+        residual = max(abs(energy_balance_residual_kwh(row)) for _, row in d.iterrows())
+        st.caption(f"Largest energy-balance residual in this hand-checkable example: {residual:.3e} kWh.")
+        with st.expander("Why cyclic SOC in the annual optimizer?"):
+            st.markdown(term_help("cyclic_soc"))
+
+    elif module == "Economics":
+        st.subheader("3 — CAPEX, WACC, CRF, NPV and payback")
+        st.write("Follow the chain: **WACC → CRF → annualized CAPEX → objective function → optimal sizing**.")
+        c1, c2 = st.columns(2)
+        with c1:
+            wacc = st.number_input("Learning WACC", min_value=0.0, max_value=0.30, value=0.05, step=0.005, format="%.3f")
+        with c2:
+            life = int(st.number_input("Learning lifetime", min_value=1, max_value=50, value=25, step=1))
+        x = crf_learning_example(float(wacc), life, 1_000_000.0)
+        st.code(
+            f"CRF = {x['crf']:.4f} 1/year\n"
+            f"€1,000,000 × {x['crf']:.4f} = €{x['annualized_capex_eur']:,.0f}/year"
+        )
+        st.info("This annualized figure is an equivalent cost used for comparison; it is not a second €1M payment every year.")
+        if st.session_state.last_result is not None and st.session_state.last_result.status == "optimal":
+            st.subheader("Use the active scenario numbers")
+            for metric_id in ("initial_capex", "crf", "annualized_capex", "npv", "payback"):
+                _worked_calculation(st, metric_id, st.session_state.last_result)
+
+    elif module == "Optimization":
+        st.subheader("4 — How the optimizer thinks")
+        st.markdown(
+            "**Decision variables** are what the LP may choose. **Constraints** are rules it cannot violate. "
+            "The **objective function** is the annualized cost it minimizes."
+        )
+        for term_id in ("lp", "decision_variable", "objective_function", "constraint", "binding", "infeasible"):
+            term = get_term(term_id)
+            with st.expander(f"{term.term} — {term.full_name}"):
+                st.markdown(term_help(term_id))
+        st.subheader("Concept map")
+        for chain in CONCEPT_DEPENDENCIES:
+            st.code(chain)
+        st.warning("Optimal means best **inside this model** — not universally best for a real factory.")
+
+    elif module == "Decarbonization":
+        st.subheader("5 — Baseline, carbon targets and abatement cost")
+        st.write(
+            "A carbon target constrains modeled **grid-related electrical emissions**. It is not renewable share and it is not self-sufficiency."
+        )
+        for term_id in ("baseline", "grid_emission_factor", "carbon_target", "binding", "abatement_cost", "sensitivity"):
+            with st.expander(get_term(term_id).full_name):
+                st.markdown(term_help(term_id))
+        if st.session_state.last_result is not None and st.session_state.last_result.status == "optimal":
+            for metric_id in ("baseline_emissions", "scenario_emissions", "co2_reduction", "co2_reduction_fraction", "abatement_cost"):
+                _worked_calculation(st, metric_id, st.session_state.last_result)
+
+    else:
+        st.subheader("6 — Walk through the Castellón case")
+        for title, explanation in CASTELLON_WALKTHROUGH:
+            with st.expander(title):
+                st.write(explanation)
+        st.subheader("Evidence chain")
+        st.code(
+            "ASCER → sector context\nOMIE → wholesale price proxy\nPVGIS → solar calibration\n"
+            "Red Eléctrica → CO₂ factor\nIDAE / IRENA → CAPEX plausibility\n"
+            "ASSUMPTIONS → representative plant\nMODEL → conditional results"
+        )
+        st.info(
+            "MODEL RESULT ≠ REALITY. If the assumptions are accepted and the model boundary is appropriate, "
+            "the optimizer recommends a solution **within the model**."
+        )
+        st.subheader("Source exercise")
+        source_answer = st.selectbox(
+            "OMIE 2025 market price is…",
+            ["Choose…", "Real plant data", "Proxy", "Model assumption", "Derived public value"],
+        )
+        if source_answer != "Choose…":
+            st.success("Correct — it is a proxy." if source_answer == "Proxy" else "Not quite. OMIE is a wholesale market proxy, not a complete plant bill.")
+
+        st.subheader("Design your own scenario")
+        st.write("Change a small set of assumptions, predict the direction first, then ask whether the result justifies **further detailed study** — not immediate construction.")
+        with st.form("student_custom_scenario"):
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                price_mult = st.number_input("Electricity price multiplier", min_value=0.5, max_value=2.0, value=1.0, step=0.1)
+                pv_mult = st.number_input("PV CAPEX multiplier", min_value=0.5, max_value=2.0, value=1.0, step=0.1)
+            with c2:
+                battery_mult = st.number_input("Battery CAPEX multiplier", min_value=0.5, max_value=2.0, value=1.0, step=0.1)
+                challenge_wacc = st.number_input("WACC", min_value=0.0, max_value=0.30, value=float(st.session_state.params["wacc"]), step=0.005, format="%.3f")
+            with c3:
+                challenge_carbon = st.number_input("Carbon target", min_value=0.0, max_value=0.8, value=0.0, step=0.05, format="%.2f")
+                predicted_pv = st.selectbox("Predict PV capacity", ["Increase", "Stay similar", "Decrease"])
+            predicted_battery = st.selectbox("Predict battery", ["More likely", "Same", "Less likely"])
+            run_challenge = st.form_submit_button("Run my scenario")
+        if run_challenge:
+            challenge = dict(st.session_state.params)
+            challenge["import_price_multiplier"] = float(price_mult)
+            challenge["pv_capex_eur_per_kw"] = float(challenge["pv_capex_eur_per_kw"]) * float(pv_mult)
+            challenge["battery_energy_capex_eur_per_kwh"] = float(challenge["battery_energy_capex_eur_per_kwh"]) * float(battery_mult)
+            challenge["battery_power_capex_eur_per_kw"] = float(challenge["battery_power_capex_eur_per_kw"]) * float(battery_mult)
+            challenge["wacc"] = float(challenge_wacc)
+            try:
+                with st.spinner("Solving your 8,760-hour scenario…"):
+                    _, reference = run_optimization_request(st.session_state.params, _load_frame(st), carbon_target=0.0, case_id=st.session_state.case_id)
+                    _, candidate = run_optimization_request(challenge, _load_frame(st), carbon_target=float(challenge_carbon), case_id=st.session_state.case_id)
+                if reference.status == "optimal" and candidate.status == "optimal":
+                    rows = []
+                    for label, attr, unit in (
+                        ("PV capacity", "pv_capacity_kw", "kW"),
+                        ("Battery energy", "battery_energy_capacity_kwh", "kWh"),
+                        ("Grid import", "grid_import_mwh", "MWh/year"),
+                        ("Annualized cost", "objective_annualized_cost_eur", "€/year"),
+                        ("NPV", "project_npv_eur", "€"),
+                        ("CO₂ reduction", "emissions_reduction_fraction", "fraction"),
+                    ):
+                        before = float(getattr(reference, attr)); after = float(getattr(candidate, attr))
+                        rows.append({"metric": label, "reference": before, "your scenario": after, "delta": after-before, "unit": unit})
+                    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+                    st.write(f"**Your PV prediction:** {predicted_pv} · **Your battery prediction:** {predicted_battery}")
+                    for text in explain_scenario_change(reference, candidate):
+                        st.info(text)
+                    st.warning("Screening question: do these results justify collecting real site data, quotations and completing detailed engineering? IEL does not answer 'build now'.")
+                else:
+                    _result_error(st, candidate)
+            except ValueError as exc:
+                st.error(str(exc))
+
+    if st.button(f"Mark {module} complete", key=f"complete_{module}"):
+        progress.add(module)
+        st.session_state.student_progress = sorted(progress)
+        st.success("Marked complete for this session.")
+
+    st.divider()
+    st.subheader("Guided experiment — predict before running")
+    experiment = st.selectbox("Experiment", GUIDED_EXPERIMENTS, format_func=lambda x: x.title)
+    st.write(experiment.question)
+    prediction = st.radio("Your prediction", experiment.prediction_options, horizontal=True, key=f"prediction_{experiment.experiment_id}")
+    st.caption("Only this one experiment will run. Your active Inputs are not overwritten.")
+    if st.button("Run guided experiment", type="primary"):
+        try:
+            with st.spinner("Running the selected engineering experiment…"):
+                run = run_guided_experiment(
+                    st.session_state.params, experiment.experiment_id,
+                    case_id=st.session_state.case_id, load_frame=_load_frame(st),
+                )
+            runs = dict(st.session_state.learning_experiment_runs)
+            runs[experiment.experiment_id] = (run, prediction)
+            st.session_state.learning_experiment_runs = runs
+        except ValueError as exc:
+            st.error(str(exc))
+    stored = st.session_state.learning_experiment_runs.get(experiment.experiment_id)
+    if stored is not None:
+        run, chosen = stored
+        st.write(f"**Your prediction:** {chosen}")
+        rows = list(run.special_metrics or run.comparison)
+        if rows:
+            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        if run.before is not None and run.after is not None and run.before.status == "optimal" and run.after.status == "optimal":
+            for text in explain_scenario_change(run.before, run.after):
+                st.info(text)
+        st.success(f"Takeaway: {experiment.takeaway}")
+        if experiment.experiment_id == "battery_capex_down" and run.after is not None:
+            has_battery = (run.after.battery_energy_capacity_kwh or 0.0) > 1e-6
+            observed = "Yes" if has_battery else "Not necessarily"
+            st.write(f"**Observed answer:** {observed}")
+        elif experiment.experiment_id == "carbon_20_to_40" and run.before is not None and run.after is not None:
+            observed = "20%" if run.before.carbon_constraint_binding else ("40%" if run.after.carbon_constraint_binding else "Neither")
+            st.write(f"**Observed binding target:** {observed}")
+
+    st.divider()
+    with st.expander(f"Concept check — {len(QUESTIONS)} questions"):
+        answers = {}
+        with st.form("student_concept_check"):
+            for q in QUESTIONS:
+                answers[q.question_id] = st.selectbox(q.prompt, ("Choose…",) + q.options, key=f"quiz_{q.question_id}")
+            check = st.form_submit_button("Check answers")
+        if check:
+            for q in QUESTIONS:
+                answer = answers[q.question_id]
+                if answer == "Choose…":
+                    st.write(f"- **{q.question_id}:** unanswered — {q.explanation}")
+                elif answer == q.correct_option:
+                    st.success(f"{q.prompt} — Correct. {q.explanation}")
+                else:
+                    st.warning(f"{q.prompt} — Not quite. {q.explanation}")
+
+
 def _methodology(st) -> None:
     st.header("Methodology & learning")
     blocks = {
@@ -593,7 +880,7 @@ def _methodology(st) -> None:
         )
         for term_id in glossary_order:
             term = get_term(term_id)
-            with st.expander(f"{term.term} — {term.full_name}"):
+            with st.expander(f"[{TERM_DIFFICULTY.get(term_id, 'INTERMEDIATE')}] {term.term} — {term.full_name}"):
                 st.markdown(term_help(term_id))
         st.subheader("Public evidence vs representative model vs real plant data")
         st.dataframe(pd.DataFrame([
@@ -649,6 +936,7 @@ def main() -> None:
         "Economics": _economics,
         "Decarbonization": _decarbonization,
         "Sensitivity": _sensitivity,
+        "Learning Lab": _learning_lab,
         "Methodology": _methodology,
     }
     pages[section](st)
