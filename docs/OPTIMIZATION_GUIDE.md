@@ -227,9 +227,9 @@ HiGHS is an open-source mathematical optimization solver suitable for LPs. The v
 
 The engineering equations are kept independent of the UI and external data sources, so the solver remains a replaceable implementation detail rather than the product architecture itself.
 
-## 17. What the future `?` icon will do
+## 17. What the `?` help control does
 
-Iteration 4 will attach a help control to important metric cards. The content already exists centrally in the explainability registry.
+The v1 Streamlit interface attaches help controls to important inputs and metric cards. Content comes from the central metric/glossary registries and active-case provenance.
 
 For a metric such as WACC, the user will be able to see:
 

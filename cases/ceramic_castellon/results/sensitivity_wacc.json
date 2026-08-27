@@ -1,0 +1,38 @@
+[
+  {
+    "input_value": 0.04,
+    "status": "optimal",
+    "pv_capacity_kw": 3088.379936717945,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "annualized_cost_eur": 865496.9316566258,
+    "project_npv_eur": 687267.9554694295,
+    "annual_saving_eur": 117868.95596932806,
+    "co2_reduction_fraction": 0.31103658665751377,
+    "input_variable": "wacc"
+  },
+  {
+    "input_value": 0.05,
+    "status": "optimal",
+    "pv_capacity_kw": 2971.594180340974,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "annualized_cost_eur": 880203.2083583749,
+    "project_npv_eur": 522604.2491271345,
+    "annual_saving_eur": 103162.67926757899,
+    "co2_reduction_fraction": 0.30393772061699825,
+    "input_variable": "wacc"
+  },
+  {
+    "input_value": 0.06,
+    "status": "optimal",
+    "pv_capacity_kw": 2869.690233289529,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "annualized_cost_eur": 895069.6707496536,
+    "project_npv_eur": 374959.4822236423,
+    "annual_saving_eur": 88296.21687630028,
+    "co2_reduction_fraction": 0.29715378435681966,
+    "input_variable": "wacc"
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "dataset_version": "ceramic-castellon-2025-v1",
+  "case_version": "ceramic-castellon-v1",
+  "reference_year": 2025,
+  "timezone": "UTC",
+  "rows": 8760,
+  "fixed_seed": 20260827,
+  "load": {
+    "classification": "DERIVED VALUE / REPRESENTATIVE SCALE ASSUMPTION",
+    "target_annual_mwh": 15000.0,
+    "source_ids": [
+      "ascer_2025_energy",
+      "ascer_membership"
+    ],
+    "transformation": "Rounded representative scale calibrated to sector electricity consumption divided by more than 100 manufacturers; hourly shape is an explicit deterministic model assumption.",
+    "statistics": {
+      "annual_energy_mwh": 15000.0,
+      "peak_demand_mw": 1.9978634934022663,
+      "average_demand_mw": 1.7123287671232876,
+      "load_factor": 0.8570799620585055,
+      "p5_demand_mw": 1.5106180257919886,
+      "p50_demand_mw": 1.7171830527521281,
+      "p95_demand_mw": 1.8789505119745924,
+      "weekday_weekend_ratio": 1.0866944118078397
+    }
+  },
+  "price": {
+    "classification": "PROXY calibrated to OFFICIAL DATA",
+    "source_ids": [
+      "omie_2025_market"
+    ],
+    "transformation": "Deterministic positive hourly shape rescaled separately in each month to match OMIE 2025 official monthly arithmetic day-ahead means exactly; not raw OMIE hourly settlement data."
+  },
+  "pv": {
+    "classification": "PROXY calibrated to PVGIS-derived public data",
+    "source_ids": [
+      "pvgis_official",
+      "pvgis_castello_proxy"
+    ],
+    "transformation": "Deterministic solar/day-cloud shape rescaled monthly to public PVGIS-v5.3-derived Castelló yield totals; not raw PVGIS hourly series.",
+    "annual_specific_yield_kwh_per_kwp": 1616.8
+  }
+}

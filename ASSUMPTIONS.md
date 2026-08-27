@@ -171,3 +171,57 @@ Not implemented yet. Iteration 5 must state:
 - Custom load uploads must match the current 8,760-hour UTC demo timeline because Iteration 4 keeps the versioned PV and price snapshots fixed. This is an explicit alignment rule, not a universal limitation of the engine.
 - Sensitivity is run one family at a time and only after user request. This is a product/performance policy, not a change to the underlying equations.
 - UI number formatting intentionally rounds for readability; engine calculations and regression tests retain full numerical precision.
+
+---
+
+# v1.0 — Representative Ceramic Plant — Castellón assumptions
+
+These assumptions are separate from the synthetic Golden Cases.
+
+## Evidence policy
+
+Every important input is classified in `cases/ceramic_castellon/sources.json` as sector/official data, derived value, proxy or model assumption. A proxy is never presented as measured plant data, and a derived value is never presented as directly published.
+
+## Representative load
+
+- Annual electricity: **15,000 MWh/year**.
+- Classification: representative model assumption calibrated to sector order of magnitude.
+- It is not described as the average ceramic factory.
+- Hourly shape: continuous high base, modest daytime uplift, 8% weekend reduction, mild seasonality and fixed-seed variability.
+- The shape is rescaled exactly to the annual target.
+
+## Electricity price
+
+- 2025 OMIE annual/monthly day-ahead evidence calibrates the price environment.
+- The committed hourly series is a **wholesale energy-price proxy**, not a complete industrial electricity bill.
+- Export price: **0 €/MWh**, conservative explicit model assumption.
+
+## PV resource
+
+- Castelló de la Plana representative city location, not a plant coordinate.
+- PVGIS 5.3 is the official methodology/source family.
+- The committed profile is a **deterministic PVGIS-calibrated representative profile**, not raw hourly PVGIS output.
+- Annual specific yield calibration: **1,616.8 kWh/kWp**.
+
+## Grid emissions
+
+- Derived from Red Eléctrica 2025 published national generation and generation-emissions totals.
+- Frozen factor: **108.375 kgCO₂eq/MWh**.
+- No export CO₂ credit.
+
+## Economics
+
+- PV CAPEX: **700 €/kW**.
+- PV OPEX: **7 €/kW-year**.
+- Battery energy CAPEX: **240 €/kWh**.
+- Battery power CAPEX: **120 €/kW**.
+- WACC: **5%**.
+- PV lifetime: **25 years**.
+- Battery/project simplified NPV horizon: **15 years**.
+- These are screening inputs, not supplier quotations or company financing terms.
+
+## System scope
+
+- Electricity + PV + battery + grid only.
+- Battery charging from allocated PV only.
+- Thermal process energy, natural gas, kilns, dryers, heat recovery, hydrogen and other technologies remain outside v1.

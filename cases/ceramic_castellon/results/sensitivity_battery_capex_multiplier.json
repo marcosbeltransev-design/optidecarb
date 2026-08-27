@@ -1,0 +1,38 @@
+[
+  {
+    "input_value": 0.8,
+    "status": "optimal",
+    "pv_capacity_kw": 2971.594180340974,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "annualized_cost_eur": 880203.2083583749,
+    "project_npv_eur": 522604.2491271345,
+    "annual_saving_eur": 103162.67926757899,
+    "co2_reduction_fraction": 0.30393772061699825,
+    "input_variable": "battery_capex_multiplier"
+  },
+  {
+    "input_value": 1.0,
+    "status": "optimal",
+    "pv_capacity_kw": 2971.594180340974,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "annualized_cost_eur": 880203.2083583749,
+    "project_npv_eur": 522604.2491271345,
+    "annual_saving_eur": 103162.67926757899,
+    "co2_reduction_fraction": 0.30393772061699825,
+    "input_variable": "battery_capex_multiplier"
+  },
+  {
+    "input_value": 1.2,
+    "status": "optimal",
+    "pv_capacity_kw": 2971.594180340974,
+    "battery_energy_capacity_kwh": 0.0,
+    "battery_power_capacity_kw": 0.0,
+    "annualized_cost_eur": 880203.2083583749,
+    "project_npv_eur": 522604.2491271345,
+    "annual_saving_eur": 103162.67926757899,
+    "co2_reduction_fraction": 0.30393772061699825,
+    "input_variable": "battery_capex_multiplier"
+  }
+]

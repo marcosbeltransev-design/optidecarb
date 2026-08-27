@@ -100,3 +100,23 @@ Streamlit UI, public deployment, real Castellón ceramic assumptions, thermal te
 - annual energy/cost/emissions calculations;
 - NPV, payback and CRF helpers;
 - tests, CI definition and initial documentation.
+
+## 1.0.0 — Representative Castellón case + learning layer
+
+### Added
+- `ceramic-castellon-v1` public-data-calibrated representative electrical case.
+- 8,760-hour deterministic load, OMIE-calibrated wholesale-price proxy and PVGIS-calibrated solar profile.
+- Case provenance registry with official/sector data, derived values, proxies and model assumptions.
+- Offline case builder, runners, regression and source-provenance tests.
+- Streamlit case selector with Castellón showcase as default and synthetic demo retained.
+- Source/provenance context in input help.
+- Central beginner glossary for energy, finance, optimization and provenance concepts.
+- Learning mode and expanded methodology/glossary presentation.
+- `CASE_STUDY.md`, `BEGINNER_GUIDE.md` and `INTERVIEW_GUIDE.md`.
+
+### Fixed
+- Imported `CERAMIC_CASE_ID` explicitly in the Streamlit application, preventing a `NameError` when rendering ceramic-case Inputs.
+
+### Unchanged
+- Optimization model equations remain **v0.3.0**.
+- Golden Cases v1, v2 and v3 remain historical regression references.

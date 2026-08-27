@@ -10,12 +10,16 @@ from pathlib import Path
 
 import pandas as pd
 
+from industrial_energy_lab.case_studies.bundles import (
+    CASE_LABELS, DEFAULT_CASE_ID, CERAMIC_CASE_ID, load_case_bundle,
+)
 from industrial_energy_lab.explainability.insights import (
     explain_optimization_result,
     explain_scenario_change,
     explain_sensitivity_results,
 )
 from industrial_energy_lab.explainability.metrics import get_metric
+from industrial_energy_lab.explainability.glossary import GLOSSARY, get_term, term_help
 from industrial_energy_lab.optimization.sensitivity import SENSITIVITY_FAMILIES
 from industrial_energy_lab.ui import APP_VERSION
 from industrial_energy_lab.ui.charts import (
@@ -43,18 +47,14 @@ from industrial_energy_lab.ui.formatting import (
 from industrial_energy_lab.ui.services import (
     ROOT,
     default_parameters,
-    load_demo_bundle,
     run_baseline_request,
     run_frontier_request,
     run_optimization_request,
     run_sensitivity_request,
     validate_custom_load,
+    parameter_provenance_help,
 )
-from industrial_energy_lab.utils.version import (
-    DATASET_VERSION,
-    OPTIMIZATION_CASE_VERSION,
-    OPTIMIZATION_MODEL_VERSION,
-)
+from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
 SECTIONS = (
     "Overview",
@@ -80,7 +80,8 @@ SENSITIVITY_LABELS = {
 
 def _state_defaults(st) -> None:
     defaults = {
-        "params": default_parameters(),
+        "case_id": DEFAULT_CASE_ID,
+        "params": default_parameters(DEFAULT_CASE_ID),
         "custom_load": None,
         "last_result": None,
         "last_dispatch": None,
@@ -88,11 +89,37 @@ def _state_defaults(st) -> None:
         "economic_dispatch": None,
         "frontier": None,
         "sensitivity_results": {},
+        "learning_mode": True,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
+
+
+METRIC_PARAMETER_KEYS = {
+    "export_price": "export_price_eur_per_mwh",
+    "pv_capex_rate": "pv_capex_eur_per_kw",
+    "pv_opex_rate": "pv_opex_eur_per_kw_year",
+    "pv_lifetime": "pv_lifetime_years",
+    "battery_energy_capex_rate": "battery_energy_capex_eur_per_kwh",
+    "battery_power_capex_rate": "battery_power_capex_eur_per_kw",
+    "battery_lifetime": "battery_lifetime_years",
+    "wacc": "wacc",
+    "project_life": "project_life_years",
+    "grid_emission_factor": "grid_emissions_factor_kg_co2_per_mwh",
+}
+
+def _bundle(st):
+    return load_case_bundle(st.session_state.case_id)
+
+def _help(st, metric_id: str, parameter_key: str | None = None) -> str:
+    base = metric_help(metric_id)
+    key = parameter_key or METRIC_PARAMETER_KEYS.get(metric_id)
+    if key is None:
+        return base
+    provenance = parameter_provenance_help(st.session_state.case_id, key)
+    return f"{base}\n\n{provenance}" if provenance else base
 
 def _invalidate_results(st) -> None:
     for key, value in (
@@ -123,7 +150,7 @@ def _result_error(st, result) -> None:
 
 def _metric(st, metric_id: str, value: str, *, delta: str | None = None) -> None:
     m = get_metric(metric_id)
-    st.metric(m.label, value, delta=delta, help=metric_help(metric_id), border=True)
+    st.metric(m.label, value, delta=delta, help=_help(st, metric_id), border=True)
 
 
 def _run_current_optimization(st, *, target: float | None = None) -> None:
@@ -131,10 +158,10 @@ def _run_current_optimization(st, *, target: float | None = None) -> None:
     requested_target = float(params.get("carbon_target", 0.0) if target is None else target)
     with st.spinner("Optimizing 8,760 hourly periods…"):
         if requested_target > 0 and st.session_state.economic_result is None:
-            e_dispatch, economic = run_optimization_request(params, _load_frame(st), carbon_target=0.0)
+            e_dispatch, economic = run_optimization_request(params, _load_frame(st), carbon_target=0.0, case_id=st.session_state.case_id)
             st.session_state.economic_dispatch = e_dispatch
             st.session_state.economic_result = economic
-        dispatch, result = run_optimization_request(params, _load_frame(st), carbon_target=requested_target)
+        dispatch, result = run_optimization_request(params, _load_frame(st), carbon_target=requested_target, case_id=st.session_state.case_id)
     st.session_state.last_dispatch = dispatch
     st.session_state.last_result = result
     if requested_target <= 0:
@@ -145,15 +172,25 @@ def _run_current_optimization(st, *, target: float | None = None) -> None:
 
 
 def _render_header(st, section: str) -> None:
+    bundle = _bundle(st)
     st.title("Industrial Energy Lab")
     st.caption("Industrial Decarbonization & Techno-Economic Screening")
-    st.info(
-        "**Synthetic industrial demo.** Current profiles and economic assumptions are "
-        "software-validation inputs. They do not represent any individual facility or a "
-        "documented Castellón ceramic plant."
-    )
+    if bundle.case_id == DEFAULT_CASE_ID:
+        st.info(
+            f"**{bundle.label}.** Public-data calibrated · reference year "
+            f"{bundle.config.get('reference_year', '—')}. {bundle.disclaimer}"
+        )
+        st.warning(
+            "**Electrical subsystem only.** Thermal process energy, kilns, dryers and "
+            "natural-gas consumption are outside the v1 model scope."
+        )
+    else:
+        st.info(
+            "**Synthetic industrial demo.** Profiles and economic assumptions are "
+            "software-validation inputs and do not represent an individual facility."
+        )
     if section != "Overview":
-        st.caption(f"Section: {section}")
+        st.caption(f"Section: {section} · Active case: {bundle.label}")
 
 
 def _overview(st) -> None:
@@ -167,6 +204,14 @@ def _overview(st) -> None:
         "Industrial Energy Lab is a **pre-feasibility screening tool**, not detailed "
         "engineering, FEED, financial advice, a control system, or a certified energy model."
     )
+    bundle = _bundle(st)
+    st.subheader("Active case")
+    c1, c2, c3 = st.columns(3)
+    with c1: st.metric("Case", bundle.label)
+    with c2: st.metric("Case version", bundle.case_version)
+    with c3: st.metric("Dataset", bundle.dataset_version)
+    if bundle.sources:
+        st.caption(f"Evidence registry: {len(bundle.sources)} traceable source/assumption records.")
     c1, c2, c3 = st.columns(3)
     with c1:
         st.subheader("8,760 h")
@@ -189,8 +234,29 @@ def _overview(st) -> None:
     )
 
 
+    if st.session_state.get("learning_mode", True):
+        st.subheader("How Industrial Energy Lab works")
+        st.markdown(
+            "**PUBLIC DATA / ASSUMPTIONS** → **VALIDATION** → **8,760-HOUR CASE** → "
+            "**BASELINE** → **PV + BATTERY MODEL** → **LP OPTIMIZATION** → "
+            "**ECONOMICS + CO₂** → **SENSITIVITY** → **INTERPRETATION**"
+        )
+        with st.expander("Why 8,760 hours?"):
+            st.markdown(term_help("hours8760"))
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown("**MW vs MWh**")
+            st.write("MW is power (rate). MWh is energy (quantity). 1 MW for 1 hour = 1 MWh.")
+        with c2:
+            st.markdown("**Self-consumption vs self-sufficiency**")
+            st.write("Self-consumption asks where PV goes; self-sufficiency asks how much site demand avoids the grid.")
+        with c3:
+            st.markdown("**Pre-feasibility**")
+            st.write("IEL screens options and assumptions; it does not replace detailed engineering or an investment decision.")
+
+
 def _input_number(st, label: str, metric_id: str, value: float, *, min_value: float, step: float, key: str, format: str | None = None):
-    kwargs = dict(label=label, value=float(value), min_value=float(min_value), step=float(step), key=key, help=metric_help(metric_id))
+    kwargs = dict(label=label, value=float(value), min_value=float(min_value), step=float(step), key=key, help=_help(st, metric_id))
     if format is not None:
         kwargs["format"] = format
     return st.number_input(**kwargs)
@@ -198,7 +264,11 @@ def _input_number(st, label: str, metric_id: str, value: float, *, min_value: fl
 
 def _inputs(st) -> None:
     st.header("Model inputs")
-    st.write("Defaults are **synthetic assumptions for model validation**. Change values, then submit once; sliders do not trigger optimization automatically.")
+    bundle = _bundle(st)
+    if bundle.case_id == CERAMIC_CASE_ID:
+        st.write("Defaults combine **public data, calibrated proxies and explicit model assumptions**. Use each `?` to see provenance and interpretation, then submit once; inputs do not trigger optimization automatically.")
+    else:
+        st.write("Defaults are **synthetic assumptions for model validation**. Change values, then submit once; inputs do not trigger optimization automatically.")
     p = dict(st.session_state.params)
     with st.form("optimization_inputs", border=True):
         st.subheader("Electricity")
@@ -240,24 +310,24 @@ def _inputs(st) -> None:
             p["battery_max_soc_fraction"] = _input_number(st, "Maximum SOC", "soc_max_fraction", p["battery_max_soc_fraction"], min_value=0.0, step=0.05, key="in_soc_max", format="%.2f")
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            p["battery_initial_soc_fraction"] = st.number_input("Initial SOC fraction", value=float(p["battery_initial_soc_fraction"]), min_value=0.0, max_value=1.0, step=0.05, key="in_soc_init", help=metric_help("soc"))
+            p["battery_initial_soc_fraction"] = st.number_input("Initial SOC fraction", value=float(p["battery_initial_soc_fraction"]), min_value=0.0, max_value=1.0, step=0.05, key="in_soc_init", help=_help(st, "soc"))
         with c2:
-            p["battery_opex_eur_per_kwh_year"] = st.number_input("Battery energy OPEX", value=float(p["battery_opex_eur_per_kwh_year"]), min_value=0.0, step=0.5, key="in_be_opex", help=metric_help("opex"))
+            p["battery_opex_eur_per_kwh_year"] = st.number_input("Battery energy OPEX", value=float(p["battery_opex_eur_per_kwh_year"]), min_value=0.0, step=0.5, key="in_be_opex", help=_help(st, "opex", "battery_opex_eur_per_kwh_year"))
         with c3:
-            p["battery_opex_eur_per_kw_year"] = st.number_input("Battery power OPEX", value=float(p["battery_opex_eur_per_kw_year"]), min_value=0.0, step=0.5, key="in_bp_opex", help=metric_help("opex"))
+            p["battery_opex_eur_per_kw_year"] = st.number_input("Battery power OPEX", value=float(p["battery_opex_eur_per_kw_year"]), min_value=0.0, step=0.5, key="in_bp_opex", help=_help(st, "opex", "battery_opex_eur_per_kw_year"))
         with c4:
             p["battery_lifetime_years"] = int(_input_number(st, "Battery lifetime", "battery_lifetime", p["battery_lifetime_years"], min_value=1.0, step=1.0, key="in_bat_life"))
 
         st.subheader("Finance & carbon")
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            p["wacc"] = st.number_input("WACC", value=float(p["wacc"]), min_value=0.0, max_value=1.0, step=0.005, format="%.3f", key="in_wacc", help=metric_help("wacc"))
+            p["wacc"] = st.number_input("WACC", value=float(p["wacc"]), min_value=0.0, max_value=1.0, step=0.005, format="%.3f", key="in_wacc", help=_help(st, "wacc", "wacc"))
         with c2:
             p["project_life_years"] = int(_input_number(st, "Project life", "project_life", p["project_life_years"], min_value=1.0, step=1.0, key="in_project_life"))
         with c3:
             p["grid_emissions_factor_kg_co2_per_mwh"] = _input_number(st, "Grid emission factor", "grid_emission_factor", p["grid_emissions_factor_kg_co2_per_mwh"], min_value=0.0, step=10.0, key="in_grid_ef")
         with c4:
-            p["carbon_target"] = st.number_input("Minimum CO₂ reduction target", value=float(p["carbon_target"]), min_value=0.0, max_value=1.0, step=0.05, format="%.2f", key="in_carbon", help=metric_help("carbon_target"))
+            p["carbon_target"] = st.number_input("Minimum CO₂ reduction target", value=float(p["carbon_target"]), min_value=0.0, max_value=1.0, step=0.05, format="%.2f", key="in_carbon", help=_help(st, "carbon_target"))
 
         submitted = st.form_submit_button("Run optimization", type="primary", use_container_width=True)
 
@@ -276,28 +346,28 @@ def _inputs(st) -> None:
 
     st.divider()
     st.subheader("Optional industrial load upload")
-    st.caption("CSV must contain `timestamp_utc` and `load_kw`, exactly 8,760 hourly rows, and match the current demo UTC timeline so PV and price snapshots remain aligned.")
-    uploaded = st.file_uploader("Load-profile CSV", type="csv", help=metric_help("annual_load"))
+    st.caption("CSV must contain `timestamp_utc` and `load_kw`, exactly 8,760 hourly rows, and match the active case UTC timeline so PV and price snapshots remain aligned.")
+    uploaded = st.file_uploader("Load-profile CSV", type="csv", help=_help(st, "annual_load"))
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Use uploaded load", disabled=uploaded is None):
             try:
                 frame = pd.read_csv(uploaded)
-                st.session_state.custom_load = validate_custom_load(frame)
+                st.session_state.custom_load = validate_custom_load(frame, st.session_state.case_id)
                 _invalidate_results(st)
                 st.success("Uploaded load validated and activated.")
             except Exception as exc:
                 st.error(f"Load profile rejected: {exc}")
     with c2:
-        if st.button("Restore synthetic demo load"):
+        if st.button("Restore active case load"):
             st.session_state.custom_load = None
             _invalidate_results(st)
-            st.success("Synthetic demo load restored.")
+            st.success("Active case load restored.")
 
 
 def _baseline(st) -> None:
     st.header("Baseline")
-    result, load, prices = run_baseline_request(st.session_state.params, _load_frame(st))
+    result, load, prices = run_baseline_request(st.session_state.params, _load_frame(st), case_id=st.session_state.case_id)
     cols = st.columns(4)
     with cols[0]: _metric(st, "annual_load", format_energy_mwh(result.annual_consumption_mwh))
     with cols[1]: _metric(st, "baseline_cost", format_eur_per_year(result.annual_energy_cost_eur))
@@ -352,13 +422,24 @@ def _optimized(st) -> None:
         for text in explain_scenario_change(st.session_state.economic_result, result):
             st.write(f"- {text}")
 
+    if st.session_state.get("learning_mode", True):
+        with st.expander("Learn: what does ‘optimal’ mean here?"):
+            st.markdown(term_help("objective_function"))
+            st.info("The economic optimum is the lowest modeled annualized cost inside the stated assumptions and constraints — not a claim that it is the best design in every real-world sense.")
+        if (result.battery_energy_capacity_kwh or 0.0) <= 1e-6:
+            with st.expander("Learn: why can the optimal battery be zero?"):
+                st.write("Zero storage is a valid optimization result. Under the current inputs, paying for battery energy/power and accepting conversion losses does not reduce modeled annualized cost enough to justify installing it.")
+        elif target > 0:
+            with st.expander("Learn: why can storage enter under a stricter CO₂ target?"):
+                st.write("A binding carbon target can make additional PV valuable. Storage can shift part of midday PV surplus into later deficit hours, reducing grid imports even when storage was not economical in the unconstrained solution.")
+
     with st.expander("Advanced details"):
         st.json({
             "solver_status": result.status,
             "solver_backend": result.solver_backend,
             "model_version": OPTIMIZATION_MODEL_VERSION,
-            "dataset_version": DATASET_VERSION,
-            "case_version": OPTIMIZATION_CASE_VERSION,
+            "dataset_version": _bundle(st).dataset_version,
+            "case_version": _bundle(st).case_version,
             "model_build_seconds": round(result.model_build_seconds, 4),
             "solve_seconds": round(result.solve_seconds, 4),
             "total_seconds": round(result.total_seconds, 4),
@@ -378,7 +459,7 @@ def _hourly(st) -> None:
     hours = st.selectbox("Window length", [24, 72, 168, 336, 744], index=2)
     st.plotly_chart(hourly_energy(dispatch, start=start, hours=hours), use_container_width=True)
     st.subheader("Battery state of charge")
-    st.caption(metric_help("soc"))
+    st.caption(_help(st, "soc"))
     st.plotly_chart(soc_chart(dispatch, result.battery_energy_capacity_kwh, start=start, hours=hours), use_container_width=True)
 
 
@@ -409,13 +490,14 @@ def _decarbonization(st) -> None:
         try:
             with st.spinner("Solving only carbon targets that are stricter than the economic optimum…"):
                 if st.session_state.economic_result is None:
-                    d, e = run_optimization_request(st.session_state.params, _load_frame(st), carbon_target=0.0)
+                    d, e = run_optimization_request(st.session_state.params, _load_frame(st), carbon_target=0.0, case_id=st.session_state.case_id)
                     st.session_state.economic_dispatch = d
                     st.session_state.economic_result = e
                 st.session_state.frontier = run_frontier_request(
                     st.session_state.params,
                     _load_frame(st),
                     economic_optimum=st.session_state.economic_result,
+                    case_id=st.session_state.case_id,
                 )
         except ValueError as exc:
             st.error(str(exc))
@@ -433,7 +515,7 @@ def _decarbonization(st) -> None:
     table["carbon_target"] *= 100
     table["emissions_reduction_fraction"] *= 100
     st.dataframe(table, use_container_width=True, hide_index=True)
-    st.caption(metric_help("abatement_cost"))
+    st.caption(_help(st, "abatement_cost"))
 
 
 def _sensitivity(st) -> None:
@@ -447,7 +529,7 @@ def _sensitivity(st) -> None:
     if st.button("Run sensitivity", type="primary"):
         try:
             with st.spinner(f"Running {SENSITIVITY_LABELS[variable]} sensitivity…"):
-                frame = run_sensitivity_request(st.session_state.params, variable, _load_frame(st))
+                frame = run_sensitivity_request(st.session_state.params, variable, _load_frame(st), case_id=st.session_state.case_id)
                 results = dict(st.session_state.sensitivity_results)
                 results[variable] = frame
                 st.session_state.sensitivity_results = results
@@ -474,11 +556,22 @@ def _methodology(st) -> None:
         "Optimization": "Decision variables include PV capacity, battery energy/power and hourly dispatch. HiGHS solves a sparse linear program over 8,760 periods.",
         "Carbon": "Modeled emissions equal grid imports times the explicit grid-emission factor. Exports receive no CO₂ credit. A carbon target can shrink the feasible set.",
         "Sensitivity": "One input family changes at a time. Results are conditional what-if analyses, not probabilities or forecasts.",
-        "Limitations": "The current demo uses synthetic data and simplified techno-economic assumptions; it is a screening model, not detailed engineering.",
+        "Limitations": "This is a screening model, not detailed engineering. In the ceramic case only the electrical subsystem is modeled; kiln/dryer heat and natural gas remain outside v1 scope.",
     }
     for title, text in blocks.items():
         with st.expander(title):
             st.write(text)
+    bundle = _bundle(st)
+    if bundle.sources:
+        st.subheader("Data & assumptions")
+        rows = [{
+            "classification": x["classification"],
+            "source": x["source_name"],
+            "used value": x["used_value"],
+            "reference year": x["reference_year"],
+        } for x in bundle.sources]
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.caption("Every external value, proxy, derived value and model assumption is traceable in cases/ceramic_castellon/sources.json.")
     st.subheader("How the optimizer works")
     st.markdown(
         "- **Decision variable:** a quantity the solver is allowed to choose.\n"
@@ -488,6 +581,26 @@ def _methodology(st) -> None:
         "- **Binding constraint:** a limit that is active at the solution and therefore shapes it.\n"
         "- **Infeasible:** no combination within the stated model bounds satisfies all constraints."
     )
+    if st.session_state.get("learning_mode", True):
+        st.subheader("Glossary — learn the language")
+        glossary_order = (
+            "power", "energy", "pv", "capacity_factor", "battery_energy", "battery_power",
+            "soc", "cyclic_soc", "capex", "opex", "annualized_capex", "wacc", "crf",
+            "npv", "payback", "baseline", "lp", "decision_variable", "objective_function",
+            "constraint", "binding", "infeasible", "self_consumption", "self_sufficiency",
+            "grid_emission_factor", "carbon_target", "abatement_cost", "sensitivity",
+            "proxy", "derived_value", "model_assumption", "prefeasibility",
+        )
+        for term_id in glossary_order:
+            term = get_term(term_id)
+            with st.expander(f"{term.term} — {term.full_name}"):
+                st.markdown(term_help(term_id))
+        st.subheader("Public evidence vs representative model vs real plant data")
+        st.dataframe(pd.DataFrame([
+            {"layer": "Public sector data", "meaning": "Published aggregate evidence", "IEL v1": "Yes"},
+            {"layer": "Representative model", "meaning": "Constructed case calibrated to public evidence", "IEL v1": "Yes"},
+            {"layer": "Real plant data", "meaning": "Facility-specific measurements/contracts", "IEL v1": "No"},
+        ]), use_container_width=True, hide_index=True)
     guide = Path(ROOT / "docs" / "OPTIMIZATION_GUIDE.md")
     method = Path(ROOT / "METHODOLOGY.md")
     with st.expander("Read full optimization guide"):
@@ -503,12 +616,29 @@ def main() -> None:
     _state_defaults(st)
     with st.sidebar:
         st.header("Industrial Energy Lab")
+        st.session_state.learning_mode = st.toggle(
+            "Learning mode", value=bool(st.session_state.get("learning_mode", True)),
+            help="Show extra explanations, examples and glossary content. Engineering calculations are unchanged.",
+        )
+        options = list(CASE_LABELS)
+        selected = st.selectbox(
+            "Case", options, index=options.index(st.session_state.case_id),
+            format_func=lambda value: CASE_LABELS[value],
+        )
+        if selected != st.session_state.case_id:
+            st.session_state.case_id = selected
+            st.session_state.params = default_parameters(selected)
+            st.session_state.custom_load = None
+            _invalidate_results(st)
+            st.rerun()
         section = st.radio("Navigate", SECTIONS, index=0)
         st.divider()
+        active = _bundle(st)
         st.caption(f"App v{APP_VERSION}")
         st.caption(f"Model v{OPTIMIZATION_MODEL_VERSION}")
-        st.caption(f"Dataset {DATASET_VERSION}")
-        st.caption("Offline engine · synthetic demo")
+        st.caption(f"Dataset {active.dataset_version}")
+        st.caption(f"Case {active.case_version}")
+        st.caption("Offline engine · case snapshots")
     _render_header(st, section)
     pages = {
         "Overview": _overview,

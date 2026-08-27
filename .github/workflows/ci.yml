@@ -18,12 +18,38 @@ jobs:
         run: python -m pip install -e ".[dev,app]"
       - name: Compile Python
         run: python -m compileall -q src scripts tests app.py
-      - name: Validate reproducible datasets
+      - name: Validate reproducible demo datasets
         run: |
           cp -a data/demo /tmp/demo-before
           cp -a data/metadata /tmp/metadata-before
           python scripts/generate_demo_data.py
           diff -ru /tmp/demo-before data/demo
           diff -ru /tmp/metadata-before data/metadata
-      - name: Test
-        run: pytest
+      - name: Validate reproducible ceramic case
+        run: |
+          cp -a cases/ceramic_castellon/data /tmp/ceramic-data-before
+          cp -a cases/ceramic_castellon/metadata /tmp/ceramic-meta-before
+          python scripts/build_ceramic_castellon_case.py
+          diff -ru /tmp/ceramic-data-before cases/ceramic_castellon/data
+          diff -ru /tmp/ceramic-meta-before cases/ceramic_castellon/metadata
+      # Solver-heavy annual regressions are intentionally isolated. Repeated
+      # HiGHS solves in one long Python process can degrade in some runtimes.
+      - name: Unit tests
+        run: pytest tests/unit
+      - name: Integration tests — non-Streamlit
+        run: |
+          pytest tests/integration/test_ceramic_case_data.py
+          pytest tests/integration/test_dataset_contract.py
+          pytest tests/integration/test_demo_baseline.py
+          pytest tests/integration/test_offline_engine.py
+          pytest tests/integration/test_pv_battery_scenario.py
+          pytest tests/integration/test_ui_golden_flow.py
+          pytest tests/integration/test_zero_cases.py
+      - name: Streamlit AppTest
+        run: pytest tests/integration/test_streamlit_smoke.py
+      - name: Golden regressions — isolated processes
+        run: |
+          pytest tests/regression/test_golden_case.py
+          pytest tests/regression/test_golden_case_v2.py
+          pytest tests/regression/test_golden_case_v3.py
+          pytest tests/regression/test_ceramic_castellon_case_v1.py
