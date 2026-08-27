@@ -42,3 +42,32 @@ class BaselineResult:
     model_version: str
     dataset_version: str
     case_version: str
+
+
+@dataclass(frozen=True)
+class ScenarioResult:
+    """Annual Iteration 2 metrics for one user-defined PV+battery scenario."""
+
+    load_mwh: float
+    pv_generation_mwh: float
+    pv_self_consumption_mwh: float
+    pv_export_mwh: float
+    battery_charge_mwh: float
+    battery_discharge_mwh: float
+    battery_losses_mwh: float
+    grid_import_mwh: float
+    grid_export_mwh: float
+    self_consumption_ratio: float
+    self_sufficiency_ratio: float
+    initial_soc_mwh: float
+    final_soc_mwh: float
+    net_stored_energy_change_mwh: float
+    baseline_annual_energy_cost_eur: float
+    annual_energy_purchase_cost_eur: float
+    annual_export_revenue_eur: float
+    annual_net_grid_energy_cost_eur: float
+    annual_operating_savings_eur: float
+    annual_emissions_tco2: float
+    model_version: str
+    dataset_version: str
+    case_version: str

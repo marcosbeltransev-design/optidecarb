@@ -64,8 +64,8 @@ def make_pv(index: pd.DatetimeIndex) -> pd.DataFrame:
     hour = index.hour.to_numpy() + 0.5
     day_of_year = index.dayofyear.to_numpy()
 
-    # ASSUMPTION: normalized synthetic solar shape; Iteration 2 replaces/augments this
-    # with a documented PV profile workflow and PV engine.
+    # ASSUMPTION: normalized synthetic solar shape used to validate the Iteration 2
+    # PV and battery engine. It is not a PVGIS or measured production profile.
     daylight = np.maximum(0.0, np.sin(np.pi * (hour - 6.0) / 12.0))
     seasonal = 0.72 + 0.28 * np.sin(2 * np.pi * (day_of_year - 80) / 365.0)
     capacity_factor = np.clip(daylight * seasonal, 0.0, 1.0)
@@ -125,7 +125,7 @@ def main() -> None:
         "pv_profile_8760.csv",
         "capacity_factor",
         "p.u. [0,1]",
-        "Synthetic normalized PV reference profile reserved for Iteration 2 engine work.",
+        "Synthetic normalized PV reference profile used by the Iteration 2 physical simulation; not PVGIS data.",
     )
 
     assumptions = {
@@ -138,6 +138,28 @@ def main() -> None:
     }
     (DEMO / "baseline_assumptions.json").write_text(
         json.dumps(assumptions, indent=2) + "\n", encoding="utf-8"
+    )
+
+    scenario_assumptions = {
+        "status": "ASSUMPTION / SOFTWARE VALIDATION ONLY",
+        "pv_capacity_kw": 4000.0,
+        "battery_energy_capacity_kwh": 4000.0,
+        "battery_power_capacity_kw": 2000.0,
+        "battery_charge_efficiency": 0.95,
+        "battery_discharge_efficiency": 0.95,
+        "battery_min_soc_fraction": 0.10,
+        "battery_max_soc_fraction": 0.90,
+        "battery_initial_soc_fraction": 0.10,
+        "export_price_eur_per_mwh": 45.0,
+        "grid_emissions_factor_kg_co2_per_mwh": 180.0,
+        "emissions_export_credit": False,
+        "note": "Synthetic Iteration 2 regression assumptions; not a recommendation or current Spanish market dataset.",
+        "model_version": "0.2.0",
+        "dataset_version": "demo-v1",
+        "case_version": "golden-v2"
+    }
+    (DEMO / "scenario_assumptions.json").write_text(
+        json.dumps(scenario_assumptions, indent=2) + "\n", encoding="utf-8"
     )
 
 

@@ -20,12 +20,10 @@ jobs:
         run: python -m compileall -q src scripts tests
       - name: Validate reproducible datasets
         run: |
-          cp data/demo/industrial_load_8760.csv /tmp/load.csv
-          cp data/demo/electricity_prices_8760.csv /tmp/prices.csv
-          cp data/demo/pv_profile_8760.csv /tmp/pv.csv
+          cp -a data/demo /tmp/demo-before
+          cp -a data/metadata /tmp/metadata-before
           python scripts/generate_demo_data.py
-          cmp data/demo/industrial_load_8760.csv /tmp/load.csv
-          cmp data/demo/electricity_prices_8760.csv /tmp/prices.csv
-          cmp data/demo/pv_profile_8760.csv /tmp/pv.csv
+          diff -ru /tmp/demo-before data/demo
+          diff -ru /tmp/metadata-before data/metadata
       - name: Test
         run: pytest
