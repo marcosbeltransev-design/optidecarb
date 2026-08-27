@@ -7,7 +7,11 @@ import pandas as pd
 from industrial_energy_lab.core.load import annual_consumption_mwh
 from industrial_energy_lab.economics.emissions import grid_emissions_tco2
 from industrial_energy_lab.schemas.models import BaselineResult, GridAssumptions
-from industrial_energy_lab.utils.version import CASE_VERSION, DATASET_VERSION, MODEL_VERSION
+from industrial_energy_lab.utils.version import (
+    BASELINE_CASE_VERSION,
+    BASELINE_MODEL_VERSION,
+    DATASET_VERSION,
+)
 from industrial_energy_lab.validation.datasets import validate_hourly_dataframe
 
 
@@ -50,7 +54,7 @@ def run_baseline(
         annual_consumption_mwh=consumption_mwh,
         annual_energy_cost_eur=cost_eur,
         annual_emissions_tco2=emissions_tco2,
-        model_version=MODEL_VERSION,
+        model_version=BASELINE_MODEL_VERSION,
         dataset_version=DATASET_VERSION,
-        case_version=CASE_VERSION,
+        case_version=BASELINE_CASE_VERSION,
     )

@@ -1,0 +1,18 @@
+{
+  "status": "ASSUMPTION / SOFTWARE VALIDATION ONLY",
+  "pv_capacity_kw": 4000.0,
+  "battery_energy_capacity_kwh": 4000.0,
+  "battery_power_capacity_kw": 2000.0,
+  "battery_charge_efficiency": 0.95,
+  "battery_discharge_efficiency": 0.95,
+  "battery_min_soc_fraction": 0.1,
+  "battery_max_soc_fraction": 0.9,
+  "battery_initial_soc_fraction": 0.1,
+  "export_price_eur_per_mwh": 45.0,
+  "grid_emissions_factor_kg_co2_per_mwh": 180.0,
+  "emissions_export_credit": false,
+  "note": "Synthetic Iteration 2 regression assumptions; not a recommendation or current Spanish market dataset.",
+  "model_version": "0.2.0",
+  "dataset_version": "demo-v1",
+  "case_version": "golden-v2"
+}

@@ -14,5 +14,5 @@
   "units": "p.u. [0,1]",
   "license": "MIT (project-generated synthetic data)",
   "dataset_version": "demo-v1",
-  "description": "Synthetic normalized PV reference profile reserved for Iteration 2 engine work."
+  "description": "Synthetic normalized PV reference profile used by the Iteration 2 physical simulation; not PVGIS data."
 }
