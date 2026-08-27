@@ -4,7 +4,7 @@
 
 Industrial Energy Lab is an offline-first Python pre-feasibility tool for industrial electrical-energy systems. Its v1 scope is intentionally narrow: 8,760-hour load modelling, PV, battery storage, grid exchange, transparent economics, grid-related CO2 accounting, linear optimization, deterministic sensitivity analysis, and a later representative ceramic-industry case for Castellón, Spain.
 
-> **Status:** Iteration 3 — Optimization is frozen on `main` with Golden Cases v1–v3. Iteration 4 has a complete Streamlit implementation candidate on `iteration-4-streamlit-web`: professional navigation, validated inputs, baseline/optimization/economics/hourly/carbon/sensitivity views, and centralized educational help. The current execution sandbox cannot install Streamlit, so native AppTest/browser validation and public deployment remain the only acceptance items not yet executed. The sourced Castellón ceramic case remains Iteration 5.
+> **Status:** Iterations 1–3 are frozen and regression-tested with Golden Cases v1–v3. Iteration 4 has a frozen v0.4 Streamlit implementation: professional navigation, validated inputs, baseline/optimization/economics/hourly/carbon/sensitivity views, and centralized educational help. Local code QA passes; native Streamlit AppTest/browser verification and public deployment remain external acceptance checks because this sandbox cannot install Streamlit and no standalone GitHub remote is currently available. The sourced Castellón ceramic case remains Iteration 5.
 
 ## What problem does it solve?
 
@@ -55,7 +55,7 @@ versioned offline datasets
                          explainability registry
                                   |
                                   v
-                        Streamlit UI (Iteration 4 candidate)
+                        Streamlit UI (Iteration 4)
 ```
 
 `core/`, `optimization/` and `explainability/` make no HTTP/API calls. Runtime calculations consume local snapshots.
@@ -104,7 +104,7 @@ versioned offline datasets
 - Golden Case v3 and binding-carbon regression.
 
 
-### Iteration 4 — Streamlit engineering interface (candidate)
+### Iteration 4 — Streamlit engineering interface
 
 - nine-section engineering UI: Overview, Inputs, Baseline, Optimized system, Hourly results, Economics, Decarbonization, Sensitivity and Methodology;
 - `st.form`-based input workflow so editing assumptions does not repeatedly solve the annual LP;
@@ -245,7 +245,7 @@ Engine input is normalized to exactly 8,760 uninterrupted UTC hours. Leap-year a
 1. **Energy Engine** — complete/frozen.
 2. **8,760h + PV + Battery** — complete/frozen.
 3. **Optimization** — complete/frozen after v0.3 validation.
-4. **Streamlit Web** — release candidate implemented; native Streamlit/browser/deployment acceptance remains pending in a runtime with app dependencies.
+4. **Streamlit Web** — v0.4 implementation frozen; native Streamlit/browser/deployment acceptance remains pending in an installable runtime with a standalone GitHub remote.
 5. **Castellón Ceramic Case** — sourced representative case study.
 
 After Iteration 5, v1.0 is considered complete. Any thermal or hydrogen extension requires an explicit product decision.
@@ -255,6 +255,6 @@ After Iteration 5, v1.0 is considered complete. Any thermal or hydrogen extensio
 MIT for project code and project-generated synthetic demo data. External datasets added later must retain their own source/license metadata.
 
 
-### Iteration 4 candidate acceptance
+### Iteration 4 validation boundary
 
-The code, service tests and dependency manifest are complete. Native Streamlit AppTest, visual browser verification, screenshots and Community Cloud deployment require a runtime that can install the optional app dependency and a standalone GitHub remote. Until those checks run, Iteration 4 is not labelled fully complete.
+The v0.4 implementation, service-layer tests, explainability checks, dependency manifest and CI smoke test are complete and frozen. In this sandbox, 66 tests pass and the single native Streamlit `AppTest` is skipped only because the optional Streamlit package cannot be downloaded. Visual browser verification, screenshots and Community Cloud deployment require an installable Streamlit runtime plus a standalone GitHub remote. These are deployment acceptance checks, not unfinished engine/UI implementation.

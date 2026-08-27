@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0-rc1 — Iteration 4: Streamlit Web candidate
+## 0.4.0 — Iteration 4: Streamlit Web
 
 ### Added
 
@@ -21,11 +21,13 @@
 - engineering equations remain outside Streamlit;
 - no database, backend, auth, generative AI or external runtime API dependency.
 
-### Acceptance still blocked by current sandbox
+### Validation and deployment state
 
-- the current runtime cannot download/install Streamlit or its missing dependencies;
-- therefore native AppTest/browser visual verification, screenshots and public Community Cloud deployment cannot be executed here;
-- the Iteration 4 branch remains a release candidate rather than being declared complete.
+- 66 non-Streamlit tests pass locally after reinstalling the editable package from the active repository;
+- clean-clone regression, dataset reproducibility and compile checks pass;
+- the optional native Streamlit `AppTest` is present in CI but is skipped in this sandbox because Streamlit cannot be downloaded here;
+- browser visual verification, screenshots and Community Cloud deployment remain external acceptance checks until a standalone GitHub remote and an installable Streamlit runtime are available;
+- the v0.4 implementation itself is frozen rather than left open for further micro-patches.
 
 ## 0.3.0 — Iteration 3: Optimization + Carbon + Explainability
 

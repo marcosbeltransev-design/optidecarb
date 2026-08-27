@@ -38,3 +38,40 @@ def explain_scenario_change(previous:OptimizationResult,current:OptimizationResu
     if previous.scenario_emissions_tco2 is not None and current.scenario_emissions_tco2 is not None and current.scenario_emissions_tco2<previous.scenario_emissions_tco2-tolerance:
         out.append(f'Modeled grid-related emissions fall by {previous.scenario_emissions_tco2-current.scenario_emissions_tco2:,.1f} tCO2/year between the two scenarios.')
     return out
+
+
+def explain_sensitivity_results(frame, variable: str, *, tolerance: float = 1e-6) -> list[str]:
+    """Describe only trends demonstrated by solved sensitivity rows."""
+    optimal = frame[frame["status"] == "optimal"].sort_values("input_value").copy()
+    if len(optimal) < 2:
+        return ["At least two optimal sensitivity points are required for a trend explanation."]
+    first, last = optimal.iloc[0], optimal.iloc[-1]
+    out: list[str] = []
+    for label, column, scale, unit in (
+        ("Optimal PV capacity", "pv_capacity_kw", 1000.0, "MW"),
+        ("Optimal battery energy", "battery_energy_capacity_kwh", 1000.0, "MWh"),
+        ("Annualized cost", "annualized_cost_eur", 1_000_000.0, "M€/year"),
+    ):
+        old = first[column]
+        new = last[column]
+        if old is None or new is None:
+            continue
+        old = float(old); new = float(new); delta = new - old
+        if abs(delta) <= max(tolerance, max(abs(old), abs(new), 1.0) * 1e-7):
+            continue
+        out.append(
+            f"{label} {'increases' if delta > 0 else 'decreases'} from "
+            f"{old / scale:,.2f} to {new / scale:,.2f} {unit} across the solved range."
+        )
+    if variable == "battery_capex_multiplier":
+        vals = optimal["input_value"].to_numpy(float)
+        caps = optimal["battery_energy_capacity_kwh"].fillna(0.0).to_numpy(float)
+        for i in range(1, len(vals)):
+            if caps[i - 1] > tolerance and caps[i] <= tolerance:
+                out.append(
+                    f"Storage changes from positive capacity to zero between the tested "
+                    f"battery-CAPEX multipliers {vals[i-1]:.2f}× and {vals[i]:.2f}×. "
+                    "This is an observed bracket, not a more precise break-even claim."
+                )
+                break
+    return out
