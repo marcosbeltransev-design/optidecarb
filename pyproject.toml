@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "industrial-energy-lab"
-version = "0.2.0"
+version = "0.3.0"
 description = "Pre-feasibility techno-economic screening engine for industrial energy decarbonization."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,6 +13,7 @@ authors = [{ name = "Marcos Beltran" }]
 dependencies = [
   "numpy>=1.26,<3",
   "pandas>=2.2,<4",
+  "scipy>=1.13,<2",
 ]
 
 [project.optional-dependencies]

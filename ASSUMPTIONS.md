@@ -1,95 +1,165 @@
-# Assumptions — Iterations 1–2
+# Assumptions — Iterations 1–3
 
-Every value below is an explicit assumption or software-validation choice. None represents a named industrial company.
+Every value below is either a software-validation assumption or an explicit model convention. None represents a named industrial company.
 
 ## A1 — Demo annual demand
 
 - Value: **22,000 MWh/year**.
-- Status: **ASSUMPTION**.
-- Source: project-defined synthetic validation case.
+- Classification: **ASSUMPTION / SOFTWARE VALIDATION**.
+- Source: deterministic project generator.
 - Fixed random seed: `20260827`.
-
-The profile combines weekday/weekend factors, a time-of-day factor, mild seasonality and controlled random variation, then is rescaled to the exact annual target.
 
 ## A2 — Demo hourly electricity prices
 
-- Status: **ASSUMPTION / SYNTHETIC**.
 - Units: EUR/MWh.
+- Classification: **ASSUMPTION / SYNTHETIC**.
 - Source: deterministic formula in `scripts/generate_demo_data.py`.
 
-It is not historical e-sios, OMIE or REData data.
+Not historical e-sios, OMIE or REData data.
 
 ## A3 — Demo grid emissions factor
 
 - Value: **180 kgCO2/MWh**.
-- Status: **ASSUMPTION / SOFTWARE VALIDATION**.
+- Classification: **ASSUMPTION / SOFTWARE VALIDATION**.
+- Source: synthetic model-validation choice.
 
 It must not be cited as a current Spanish grid factor.
 
 ## A4 — Cost boundary
 
-Energy cost currently includes hourly commodity energy purchases minus modeled export revenue. It excludes taxes, network/access tariffs, contracted-power charges, reactive energy, penalties and bespoke retail/PPA structures.
+Current grid economics include hourly energy purchases minus PV-export revenue. They exclude taxes, network/access tariffs, contracted-power charges, reactive energy, penalties and bespoke PPA/retail structures.
 
 ## A5 — Time normalization
 
 - engine timeline: UTC;
-- exactly 8,760 rows;
-- one-hour resolution;
-- leap-year and DST normalization occurs before the core.
+- 8,760 rows;
+- one-hour intervals;
+- DST/leap-year normalization occurs upstream.
 
 ## A6 — Demo PV profile
 
-- Status: **ASSUMPTION / SYNTHETIC**.
-- Variable: hourly capacity factor in `[0,1]`.
+- Classification: **ASSUMPTION / SYNTHETIC**.
+- Variable: capacity factor `[0,1]`.
 - Dataset version: `demo-v1`.
+- Source: deterministic project generator, not PVGIS.
 
-It is intentionally deterministic and is **not** presented as PVGIS data.
+## A7 — Golden Case v2 fixed capacities
 
-## A7 — Golden Case v2 PV and battery sizes
+- PV: 4,000 kW;
+- battery energy: 4,000 kWh;
+- battery power: 2,000 kW.
 
-The regression case uses:
+Chosen only to exercise the physical simulator.
 
-- PV capacity: **4,000 kW**;
-- battery energy capacity: **4,000 kWh**;
-- battery power capacity: **2,000 kW**.
+## A8 — Battery efficiencies and SOC convention
 
-Status: **ASSUMPTION / SOFTWARE VALIDATION**. These are chosen to exercise direct PV use, storage, export and grid imports; they are not optimized or recommended sizes.
+Golden v2 and v3 validation defaults:
 
-## A8 — Golden Case v2 battery efficiencies and SOC
+- charge efficiency: 95%;
+- discharge efficiency: 95%;
+- min SOC: 10%;
+- max SOC: 90%;
+- initial SOC fraction: 10%.
 
-- charge efficiency: **95%**;
-- discharge efficiency: **95%**;
-- minimum SOC: **10%**;
-- maximum SOC: **90%**;
-- initial SOC: **10%**.
+No degradation, self-discharge, thermal dependence, auxiliaries or cycle-life cost is included.
 
-Status: **ASSUMPTION / SOFTWARE VALIDATION**. No degradation, self-discharge, temperature dependence, auxiliary consumption or cycle-life cost is modeled yet.
+## A9 — Export prices
 
-## A9 — Export price
+- Golden v2 physical simulation: **45 EUR/MWh**.
+- Golden v3 optimization: **20 EUR/MWh**.
 
-- Golden Case v2 value: **45 EUR/MWh**.
-- Status: **ASSUMPTION / SYNTHETIC**.
+Both are **synthetic assumptions**, not current Spanish tariffs or forecasts. Golden v3 uses the lower value deliberately so additional PV eventually faces declining onsite economic value.
 
-It is not a current Spanish compensation tariff or market forecast.
+## A10 — Battery operating boundary
 
-## A10 — Battery dispatch
+In v0.3 the optimized battery charges only from the PV allocation and discharges only to onsite load. Grid charging and battery export are excluded.
 
-Iteration 2 is PV-first and deterministic. The battery charges only from surplus PV and discharges only to serve site load. Grid charging, battery export and price arbitrage are intentionally excluded until optimization is introduced.
+## A11 — SOC boundary
 
-## A11 — SOC boundary treatment
-
-Final SOC is not artificially forced equal to initial SOC in the deterministic simulator. Both are reported. For the annual golden case, initial SOC equals minimum SOC to avoid a free initial-energy benefit. A cyclic boundary will be considered explicitly in Iteration 3 optimization.
+Iteration 2 reports actual final SOC. Iteration 3 optimization enforces a cyclic annual SOC at the same configured initial fraction of optimized capacity.
 
 ## A12 — Export emissions
 
-Exports receive **zero CO2 credit** in Iteration 2. Scenario emissions are calculated only from gross grid imports and the explicit emissions factor.
+Exports receive **no CO2 credit**. Operational emissions are attributed only to gross grid imports using the explicit grid factor.
 
-## A13 — Financial calculations
+## A13 — Financial primitives
 
-NPV assumes end-of-year annual cash flows and upfront `t=0` CAPEX. Simple payback ignores discounting by definition. Iteration 2 reports operating-energy savings but does not optimize investment sizing.
+NPV assumes upfront `t=0` CAPEX and equal end-of-year operating cash flows. Simple payback ignores discounting by definition.
 
-## A14 — Representative ceramic plant
+## A14 — Golden Case v3 PV economics
 
-Not implemented yet. The future Castellón case must state:
+From `data/demo/optimization_assumptions.json`:
+
+| Parameter | Value | Unit | Classification | Source |
+|---|---:|---|---|---|
+| PV CAPEX | 1,600 | EUR/kW | ASSUMPTION | Synthetic validation choice |
+| PV OPEX | 10 | EUR/kW-year | ASSUMPTION | Synthetic validation choice |
+| PV life | 25 | years | ASSUMPTION | Synthetic validation choice |
+
+These values are selected to create a useful validation case; they are not a market benchmark.
+
+## A15 — Golden Case v3 battery economics
+
+| Parameter | Value | Unit | Classification | Source |
+|---|---:|---|---|---|
+| Energy CAPEX | 150 | EUR/kWh | ASSUMPTION | Synthetic validation choice |
+| Power CAPEX | 100 | EUR/kW | ASSUMPTION | Synthetic validation choice |
+| Energy OPEX | 2 | EUR/kWh-year | ASSUMPTION | Synthetic validation choice |
+| Power OPEX | 1 | EUR/kW-year | ASSUMPTION | Synthetic validation choice |
+| Battery life | 15 | years | ASSUMPTION | Synthetic validation choice |
+
+## A16 — WACC and project life
+
+- WACC: **5%**;
+- simplified NPV project life: **15 years**.
+
+Classification: **ASSUMPTION / SOFTWARE VALIDATION**. This is not a company-specific financing recommendation.
+
+## A17 — Model/site bounds
+
+Golden v3:
+
+- max PV: 12,000 kW;
+- max battery energy: 12,000 kWh;
+- max battery power: 6,000 kW.
+
+Classification: **MODEL BOUNDS**, not physical universal limits. They stand in for site/decision-space constraints and support feasibility testing.
+
+## A18 — LP anti-arbitrage convention
+
+For every hour:
+
+```text
+ExportPrice < ImportPrice
+```
+
+is required. This is a model-validity condition for the continuous LP formulation, not a statement about every possible commercial contract.
+
+## A19 — Throughput tie-break
+
+A numerically tiny positive cost is added to battery charge/discharge variables only to remove degenerate simultaneous cycling. It is many orders of magnitude below material economic terms and is excluded from reported annualized economics.
+
+## A20 — Simplified NPV limitations
+
+The v0.3 post-processing NPV excludes:
+
+- battery/PV replacement;
+- degradation;
+- residual/salvage value;
+- taxes and depreciation;
+- inflation/escalation;
+- debt/equity cash-flow structure.
+
+For that reason the configured project life cannot exceed the shortest modeled technology lifetime.
+
+## A21 — Sensitivity interpretation
+
+Sensitivity is deterministic one-at-a-time analysis, not uncertainty probability. A result at `0.8x CAPEX` means only that the tested assumption was multiplied by 0.8 while all other inputs stayed fixed.
+
+The targeted battery-CAPEX scan in the synthetic Golden v3 case observed positive storage at `0.74x` and zero storage at `0.76x`. This is an **observed grid transition**, not a universal or exact commercial break-even price.
+
+## A22 — Representative ceramic plant
+
+Not implemented yet. Iteration 5 must state:
 
 > Synthetic representative industrial profile calibrated using publicly available sector information. It does not represent any individual company.
