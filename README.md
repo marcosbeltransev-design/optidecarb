@@ -4,7 +4,7 @@
 
 Industrial Energy Lab (IEL) is an offline-first Python **pre-feasibility** tool for industrial **electrical** decarbonization. It combines validated 8,760-hour energy balances, photovoltaic (PV) generation, battery storage, grid exchange, transparent economics, linear programming (LP), carbon constraints, deterministic sensitivity analysis, explainability, and a public-data-calibrated representative ceramic-industry case for Castellón, Spain.
 
-> **v1.0 scope:** electricity + PV + battery + grid. Thermal process energy, kilns, dryers and natural-gas consumption are outside the model boundary.
+> **v1.1 scope:** electricity + PV + battery + grid, plus a deterministic Student Learning Lab. Thermal process energy, kilns, dryers and natural-gas consumption are outside the model boundary.
 
 > **Case disclaimer:** The Castellón representative case is constructed from public sector data and explicit modelling assumptions. It does not reproduce the operations, costs or energy consumption of any individual ceramic company.
 
@@ -28,11 +28,27 @@ Grid imports and PV exports are calculated consistently from hourly residual bal
 Start here:
 
 - [`docs/BEGINNER_GUIDE.md`](docs/BEGINNER_GUIDE.md) — power vs energy, PV, batteries, economics, optimization and carbon from zero;
+- [`docs/STUDENT_LAB.md`](docs/STUDENT_LAB.md) — eight guided exercises with worked calculations and suggested answers;
 - [`docs/OPTIMIZATION_GUIDE.md`](docs/OPTIMIZATION_GUIDE.md) — the LP formulation in engineering language;
 - [`docs/INTERVIEW_GUIDE.md`](docs/INTERVIEW_GUIDE.md) — short/deeper answers to common technical interview questions;
 - [`cases/ceramic_castellon/CASE_STUDY.md`](cases/ceramic_castellon/CASE_STUDY.md) — the complete representative Castellón case.
 
-The Streamlit interface also exposes a **Learning mode** plus contextual `?` help for important inputs/results. Definitions come from one central explainability registry, not duplicated page text.
+The Streamlit interface also exposes a **Learning mode**, contextual `?` help and a dedicated **Student Learning Lab**. Definitions come from central registries, while worked calculations use the active solved result rather than copied example text.
+
+## Learn with Industrial Energy Lab
+
+v1.1 adds active learning without changing the engineering model:
+
+- **worked calculations:** formula → scenario numbers → result → dimensional check;
+- **hand-checkable labs:** MW/MWh, battery duration, CRF and a three-hour battery dispatch;
+- **predict before running:** six guided one-change-at-a-time experiments;
+- **scenario comparison:** before / after / delta for PV, battery, grid, cost, NPV and CO₂;
+- **Explain this hour:** narrates one solved dispatch hour and checks its energy balance;
+- **Castellón walkthrough:** ten steps from public evidence to model limitations;
+- **concept check:** deterministic questions with explanations, no scores/accounts/AI;
+- **session-only progress:** optional learning progress without a database.
+
+The learning objective is not to memorize rules such as “higher WACC = less PV”. It is to trace the chain **WACC → CRF → annualized CAPEX → objective → optimal sizing**, run a controlled experiment, and interpret the actual solved result conditionally.
 
 ## How IEL works
 
@@ -102,12 +118,13 @@ case bundles
         +--> economics/     cost/NPV/payback
         +--> optimization/  sparse 8,760h LP + carbon + sensitivity
         +--> explainability/ metric registry + glossary + rule-based insights
+        +--> learning/      worked examples + experiments + hourly explanations
         +--> ui/            Streamlit orchestration/presentation only
 ```
 
 The UI does not reimplement engineering equations.
 
-## v1 features
+## v1.1 features
 
 ### Physical model
 
@@ -179,6 +196,16 @@ IEL intentionally does not run every sensitivity family on every UI rerun.
 - deterministic “Why this solution?” insights;
 - no generative-AI dependency.
 
+### Student Learning Lab
+
+- six-level learning path from units to the Castellón application;
+- six guided experiments using one changed assumption at a time;
+- dynamic worked calculations for self-consumption, self-sufficiency, emissions, abatement cost, CAPEX, CRF, annualized CAPEX, annual saving, NPV and payback;
+- hand-checkable three-hour battery example using the same physical dispatch code as production;
+- common engineering traps and concept dependencies;
+- compact concept check and final “design your own scenario” exercise;
+- no gamification, user accounts or LLM-generated explanations.
+
 ## Representative Ceramic Plant — Castellón
 
 The default v1 showcase is **`ceramic-castellon-v1`**, a public-data-calibrated representative electrical case with reference year 2025.
@@ -238,7 +265,7 @@ Read the case study for the evidence, formulas, sensitivity and limitations behi
 
 ## Streamlit interface
 
-Nine sections:
+Ten sections:
 
 1. Overview
 2. Inputs
@@ -248,7 +275,8 @@ Nine sections:
 6. Economics
 7. Decarbonization
 8. Sensitivity
-9. Methodology & learning
+9. Learning Lab
+10. Methodology & learning
 
 Inputs use `st.form`, so editing a value does not repeatedly trigger the 8,760-hour optimizer.
 
@@ -293,6 +321,7 @@ python scripts/run_baseline.py
 python scripts/run_scenario.py
 python scripts/run_optimization.py
 python scripts/run_ceramic_castellon_case.py
+python scripts/run_student_examples.py
 ```
 
 ## Run web app
@@ -305,19 +334,21 @@ streamlit run app.py
 
 ```bash
 python -m compileall -q src scripts tests
-pytest
+python scripts/run_test_matrix.py
 ```
+
+The isolated test runner is intentional: repeated annual HiGHS solves can degrade when many large LPs are accumulated in a single long-lived process in the current environment. Each test file therefore runs in a fresh process.
 
 Golden Cases v1–v3 protect the synthetic engine history. `ceramic_castellon_case_v1.json` freezes the sourced representative case separately.
 
 ## Versioning
 
-- application/package: **v1.0.0**;
+- application/package: **v1.1.0**;
 - optimization model: **v0.3.0**;
 - representative case: **ceramic-castellon-v1**;
 - representative dataset: **ceramic-castellon-2025-v1**.
 
-The model version remains 0.3.0 because Iteration 5 adds data, case integration and education rather than new optimization equations.
+The model version remains 0.3.0 because v1.1 adds education/UI services rather than new optimization equations.
 
 ## Important limitations
 

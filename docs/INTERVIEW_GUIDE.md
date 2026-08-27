@@ -119,3 +119,24 @@ Use the **Short answer** first. Expand only when the interviewer asks.
 
 ## What would you improve in v2?
 **Short answer:** Only after v1, I would evaluate thermal-process modeling, richer tariff/contracts, degradation/replacements and possibly more advanced optimization — but only where data and use cases justify the complexity.
+
+---
+
+## Study map if an answer is difficult
+
+Use the Student Lab instead of memorizing sentences:
+
+| Interview topic | Practice first |
+|---|---|
+| MW vs MWh / battery MW vs MWh | Student Lab Exercise 1 |
+| PV generation and self-consumption | Exercise 2 |
+| SOC, losses, cyclic SOC | Exercise 3 |
+| WACC, CRF, annualized CAPEX, NPV/payback | Exercise 4 |
+| LP, objective, constraints, optimum | Exercise 5 |
+| Binding carbon constraint / infeasible | Exercise 6 |
+| Sensitivity and conditional language | Exercise 7 |
+| Data provenance, OMIE proxy, Castellón limitations | Exercise 8 |
+
+A good interview answer should follow the same pattern as the Learning Lab:
+
+**define → explain why it matters → use an IEL example → state the limitation.**
