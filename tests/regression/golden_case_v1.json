@@ -1,0 +1,8 @@
+{
+  "model_version": "0.1.0",
+  "dataset_version": "demo-v1",
+  "case_version": "golden-v1",
+  "annual_consumption_mwh": 22000.0,
+  "annual_energy_cost_eur": 1968663.723359,
+  "annual_emissions_tco2": 3960.0
+}

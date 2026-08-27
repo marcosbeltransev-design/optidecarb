@@ -1,0 +1,18 @@
+{
+  "name": "industrial_load_8760.csv",
+  "source": "Synthetic deterministic generator included in this repository",
+  "status": "ASSUMPTION / SOFTWARE VALIDATION DATA",
+  "generated_on": "2026-08-27",
+  "generator": "scripts/generate_demo_data.py",
+  "seed": 20260827,
+  "calendar_year": 2025,
+  "timezone": "UTC",
+  "case_timezone_context": "Europe/Madrid",
+  "dst_policy": "Engine inputs use an uninterrupted UTC hourly index; local DST normalization is external to the engine.",
+  "rows": 8760,
+  "value_column": "load_kw",
+  "units": "kW average over each 1-hour interval",
+  "license": "MIT (project-generated synthetic data)",
+  "dataset_version": "demo-v1",
+  "description": "Generic synthetic industrial electrical demand, rescaled to exactly 22,000 MWh/year."
+}
