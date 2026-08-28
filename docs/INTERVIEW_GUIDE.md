@@ -14,38 +14,26 @@ Use the **Short answer** first. Expand only when the interviewer asks.
 
 **Deeper answer:** Annual averages lose coincidence and battery state dynamics. 8,760 = 24 × 365.
 
-**OptiDecarb example:** The UI may plot one week, but the optimizer still solves the full year.
-
 ## Why linear programming?
 **Short answer:** The v1 equations and objective can be expressed linearly, so LP is transparent, efficient and reproducible.
 
 **Deeper answer:** Capacity and dispatch variables are continuous; energy balances, SOC and bounds are linear. This avoids unnecessary MILP complexity.
-
-**OptiDecarb example:** HiGHS solves the sparse annual problem through SciPy `linprog`.
 
 ## What are decision variables?
 **Short answer:** Quantities the solver is allowed to choose.
 
 **Deeper answer:** PV capacity, battery energy capacity, battery power capacity and hourly dispatch.
 
-**OptiDecarb example:** WACC is an input parameter; PV capacity is a decision variable.
-
 ## What is the objective function?
 **Short answer:** The quantity the optimizer minimizes.
 
 **Deeper answer:** OptiDecarb minimizes annualized PV/battery cost + OPEX + grid purchases - export revenue.
 
-**OptiDecarb example:** NPV is calculated afterwards rather than mixed into the LP objective.
-
 ## What is a constraint?
 **Short answer:** A mathematical rule the solution cannot violate.
 
-**OptiDecarb example:** SOC bounds, battery power, energy balance, PV availability and optional carbon targets.
-
 ## Why cyclic SOC?
 **Short answer:** To prevent free energy at the beginning or end of the annual model.
-
-**Deeper answer:** The battery ends with the same SOC condition it started, so the optimizer cannot start full for free or empty it at year-end for artificial benefit.
 
 ## Why can optimal battery be zero?
 **Short answer:** Because the optimizer installs a technology only if its benefit exceeds its annualized cost under the assumptions.
@@ -60,12 +48,8 @@ Use the **Short answer** first. Expand only when the interviewer asks.
 ## What is WACC?
 **Short answer:** Weighted Average Cost of Capital, the financing/discount rate used for annualization and NPV.
 
-**OptiDecarb example:** Raising WACC from 4% to 6% reduces optimal PV in the representative case.
-
 ## What is CRF?
 **Short answer:** Capital Recovery Factor converts upfront CAPEX into equivalent annual cost.
-
-**Formula:** `r(1+r)^n / ((1+r)^n - 1)`.
 
 ## Why annualized cost?
 **Short answer:** It puts multi-year asset investment and yearly grid/OPEX costs in the same €/year unit for optimization.
@@ -94,8 +78,6 @@ Use the **Short answer** first. Expand only when the interviewer asks.
 ## What is abatement cost?
 **Short answer:** Change in annualized cost per tonne of CO₂ avoided relative to baseline.
 
-**OptiDecarb example:** Negative at the economic optimum; positive by the frozen 50% carbon point.
-
 ## What is sensitivity analysis?
 **Short answer:** Change one assumption and re-solve to see how the optimum changes.
 
@@ -109,34 +91,32 @@ Use the **Short answer** first. Expand only when the interviewer asks.
 ## What is a proxy?
 **Short answer:** A transparent approximation used when the exact plant-specific value is unavailable.
 
-**OptiDecarb example:** The OMIE-calibrated hourly series is a wholesale energy-price proxy, not an industrial bill.
-
 ## Why isn't OMIE the industrial electricity bill?
 **Short answer:** Industrial bills/contracts can include hedging, network charges, power terms, taxes, supplier margins and other components outside the wholesale day-ahead energy price.
 
 ## Why is this only electrical decarbonization?
 **Short answer:** v1 intentionally models electricity + PV + battery + grid. Ceramic kilns/dryers and natural-gas thermal demand are excluded.
 
-## What would you improve in v2?
-**Short answer:** Only after v1, I would evaluate thermal-process modeling, richer tariff/contracts, degradation/replacements and possibly more advanced optimization — but only where data and use cases justify the complexity.
-
----
-
 ## Study map if an answer is difficult
 
-Use the Student Lab instead of memorizing sentences:
-
-| Interview topic | Practice first |
-|---|---|
-| MW vs MWh / battery MW vs MWh | Student Lab Exercise 1 |
-| PV generation and self-consumption | Exercise 2 |
-| SOC, losses, cyclic SOC | Exercise 3 |
-| WACC, CRF, annualized CAPEX, NPV/payback | Exercise 4 |
-| LP, objective, constraints, optimum | Exercise 5 |
-| Binding carbon constraint / infeasible | Exercise 6 |
-| Sensitivity and conditional language | Exercise 7 |
-| Data provenance, OMIE proxy, Castellón limitations | Exercise 8 |
-
-A good interview answer should follow the same pattern as the Learning Lab:
+Use the Student Lab instead of memorizing sentences. A good interview answer should follow the same pattern as the Learning Lab:
 
 **define → explain why it matters → use an OptiDecarb example → state the limitation.**
+
+## How did you use AI in this project?
+
+**Short answer:** I used AI extensively for software development, but I do not present the project as manually coded line by line. I used it as an engineering learning project: I defined the scope, challenged assumptions, validated outputs and made sure I could explain the methodology and limitations.
+
+**Deeper answer:** The important part for me was not accepting generated code or explanations blindly. I kept a validated model version, regression cases, traceable public data and explicit assumptions. The project helped me learn how to ask better engineering questions and how to explain uncertainty.
+
+## What would you ask for before using OptiDecarb on a real site?
+
+**Short answer:** Real interval load data, electricity contract / tariff information, site space, grid/export constraints and supplier quotations as the project matures.
+
+**Deeper answer:** I would also confirm the metering boundary, production calendar, planned shutdowns, electrical infrastructure, project objectives and the finance assumptions used by the company.
+
+## How would you present the 2.97 MW result to management?
+
+**Short answer:** I would say “around 3 MWp appears attractive under the current screening assumptions,” not “build exactly 2.972 MW.”
+
+**Deeper answer:** I would also state the main uncertainty and the next validation step. Model precision is not the same as project precision.

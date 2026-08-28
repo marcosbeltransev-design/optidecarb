@@ -2,6 +2,10 @@
 
 This guide is the fastest route from basic engineering knowledge to understanding **why OptiDecarb behaves the way it does**. For active practice, pair it with [`STUDENT_LAB.md`](STUDENT_LAB.md).
 
+**Language rule in v1.2:** start with clear English, then learn the professional term, then open deeper technical detail if you need it. The goal is to become comfortable with international engineering English without hiding a simple idea behind difficult wording.
+
+When you see a concept, try to answer three questions: **What is it? Why does it matter? Where could I see it at work?**
+
 ## 1. Start with units: MW is not MWh
 
 **Power** answers “how fast is energy being used or delivered?” Units: kW or MW.
@@ -23,13 +27,7 @@ Think of the first relation as a dimensional sanity check: `MW × h = MWh`.
 
 A non-leap year has `24 × 365 = 8,760` hours. OptiDecarb models the full year because annual averages cannot tell us **when** load, PV generation and electricity prices occur.
 
-Timing matters for:
-
-- direct PV consumption;
-- exports;
-- battery charge/discharge;
-- State of Charge (SOC);
-- hourly electricity purchases.
+Timing matters for direct PV consumption, exports, battery charge/discharge, State of Charge (SOC) and hourly electricity purchases.
 
 The UI may display a week for readability, but the optimizer still solves all 8,760 hours.
 
@@ -47,20 +45,13 @@ Why does the optimum not install infinite PV? The first PV capacity often displa
 
 ## 4. Battery: MW, MWh and SOC
 
-A battery needs two sizes:
-
-- **energy capacity [MWh]** — how much it can store;
-- **power capacity [MW]** — how quickly it can charge/discharge.
-
-**SOC — State of Charge** is stored energy at a particular time.
+A battery needs two sizes: **energy capacity [MWh]** and **power capacity [MW]**. **SOC — State of Charge** is stored energy at a particular time.
 
 OptiDecarb models charge/discharge efficiency. Storage shifts energy; it does not create it.
 
 ### Cyclic SOC
 
 The annual optimization requires the battery to end with the same SOC condition it started with. This prevents free boundary energy — for example, starting full without paying for that energy or ending empty simply to improve the objective.
-
-**Student Lab:** Exercise 3 walks through the exact 3-hour battery example used by the physical tests.
 
 ## 5. Grid and baseline
 
@@ -84,19 +75,9 @@ A €2M PV system is not €2M/year.
 
 **WACC — Weighted Average Cost of Capital** is the financing/discount rate used by OptiDecarb. Spanish clarification: *coste medio ponderado del capital*.
 
-It matters through this chain:
-
 ```text
-WACC ↑
-  ↓
-CRF ↑
-  ↓
-Annualized CAPEX ↑
-  ↓
-Capital-intensive options can become less attractive
+WACC ↑ → CRF ↑ → Annualized CAPEX ↑ → capital-intensive options can become less attractive
 ```
-
-This is a ceteris-paribus relationship, not a universal prediction of the exact optimal size.
 
 ### CRF
 
@@ -117,41 +98,24 @@ At 5% WACC and 25 years, CRF is about `0.071/year`; a €1M investment is theref
 NPV = -initial CAPEX + Σ cash_flow[t] / (1+r)^t
 ```
 
-- NPV > 0: modeled discounted benefits exceed CAPEX under the assumptions;
-- NPV < 0: they do not.
-
 Positive NPV **does not mean “build the project.”** OptiDecarb is pre-feasibility.
 
 ### Payback
 
 **Simple payback = initial CAPEX / annual operating cash benefit.** It is intuitive but ignores time value of money. NPV and payback answer different questions.
 
-**Student Lab:** Exercise 4 connects WACC → CRF → annualized CAPEX.
-
 ## 7. Optimization without the black box
 
 **LP — Linear Programming** chooses continuous decision variables while respecting linear constraints.
 
 ### Decision variables
-What the optimizer may choose, such as:
-
-- PV capacity;
-- battery MWh;
-- battery MW;
-- hourly dispatch.
+What the optimizer may choose, such as PV capacity, battery MWh, battery MW and hourly dispatch.
 
 ### Parameters
 Inputs the optimizer does not choose, such as WACC or PV unit CAPEX.
 
 ### Objective
-OptiDecarb minimizes equivalent **annualized system cost**:
-
-```text
-annualized PV + battery cost
-+ OPEX
-+ grid purchases
-- export revenue
-```
+OptiDecarb minimizes equivalent **annualized system cost**.
 
 ### Constraints
 Rules the optimizer cannot break: hourly energy balance, PV availability, battery power, SOC bounds, model/site capacity bounds and optional carbon target.
@@ -166,8 +130,6 @@ A **binding constraint** is active at the solution. If the unconstrained economi
 
 ## 9. Self-consumption vs self-sufficiency
 
-These use different denominators.
-
 ```text
 Self-consumption = PV used onsite / PV generated
 Self-sufficiency = (Load - grid imports) / Load
@@ -180,11 +142,9 @@ Self-consumption ≈ 4,559 / 4,804 ≈ 94.9%
 Self-sufficiency ≈ (15,000 - 10,441) / 15,000 ≈ 30.4%
 ```
 
-So almost all PV can stay onsite while most annual demand is still supplied by the grid.
-
 ## 10. Carbon and abatement cost
 
-OptiDecarb v1.1 models electrical grid-related emissions as:
+OptiDecarb models electrical grid-related emissions as:
 
 ```text
 CO₂ = grid import [MWh] × grid emission factor [kgCO₂/MWh] / 1,000
@@ -193,15 +153,6 @@ CO₂ = grid import [MWh] × grid emission factor [kgCO₂/MWh] / 1,000
 Unit check: `MWh × kgCO₂/MWh = kgCO₂`; divide by 1,000 for tonnes.
 
 A **carbon target** is a minimum reduction versus baseline. It is not renewable share.
-
-**Abatement cost**:
-
-```text
-(Scenario annualized cost - baseline annual cost) / avoided tCO₂
-```
-
-- negative €/tCO₂: emissions reduction also lowers modeled annualized cost;
-- positive €/tCO₂: deeper reduction requires extra annualized cost.
 
 ## 11. Sensitivity is an experiment, not a forecast
 
@@ -229,21 +180,9 @@ The frozen economic optimum is roughly 2.97 MW PV with zero battery. This is leg
 
 The economic optimum already reduces modeled electrical CO₂ by about 30%. At a 40% minimum target, the constraint becomes binding; more PV is required and storage enters the least-cost feasible solution.
 
-Read [`../cases/ceramic_castellon/CASE_STUDY.md`](../cases/ceramic_castellon/CASE_STUDY.md) for the full evidence chain.
-
 ## 14. What OptiDecarb does not know
 
-OptiDecarb does not know the real plant's:
-
-- roof/land geometry;
-- electrical single-line diagram;
-- network constraints;
-- tariff/hedging contract;
-- supplier quotations;
-- battery degradation/replacement plan;
-- financing agreement;
-- kiln/dryer gas demand;
-- future market prices.
+OptiDecarb does not know the real plant's roof/land geometry, electrical single-line diagram, network constraints, tariff/hedging contract, supplier quotations, battery degradation/replacement plan, financing agreement, kiln/dryer gas demand or future market prices.
 
 That is why OptiDecarb is **pre-feasibility**: it asks whether a scenario justifies more detailed study.
 

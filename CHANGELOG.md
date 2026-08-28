@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.2.0 — Junior Engineer & Industry Learning Lab
+
+### Added
+
+- dedicated **Junior Engineer Lab** for imperfect data, sanity checks, client situations, supplier questions, stakeholder thinking and professional communication;
+- optional **Industry Mode** layered on top of Learning Mode;
+- eight deterministic mini industry cases with correct-answer reasoning, weaker-answer feedback, checks and next-data requests;
+- professional vocabulary registry covering screening, feasibility, FEED, EPC, due diligence, PPA, curtailment, tariffs, commissioning, O&M and related terms;
+- role-specific learning for operations, finance, sustainability, maintenance and management;
+- practical checklists before modelling, trusting results, management presentation, supplier contact and CO₂ claims;
+- explicit “Can I trust this result?” and “What would a company do next?” guidance for solved systems;
+- original OptiDecarb logo, favicon sizes, ICO asset and lightweight engineering hero illustration;
+- Windows installed-site guide;
+- honest AI-assisted development and CV/interview positioning documentation.
+
+### Changed
+
+- user-facing education rewritten toward **clear international professional English**: simple idea first, professional term second, optional technical detail after;
+- glossary expanded with easy explanations, difficulty metadata and limited Spanish clarification for selected difficult terms;
+- Overview, Inputs, errors, Optimization, Economics, Decarbonization, Sensitivity and Methodology receive clearer educational / junior-engineer context;
+- README and learning documentation reposition OptiDecarb as both a validated engineering model and a learning environment.
+
+### Preserved
+
+- optimization model remains **v0.3.0**;
+- no new physics, energy technologies, database, accounts, chatbot or runtime AI;
+- `ceramic-castellon-v1`, `ceramic-castellon-2025-v1` and frozen regression targets remain unchanged.
+
 ## 1.1.1 — OptiDecarb rebrand
 
 - renamed the public product from **Industrial Energy Lab** to **OptiDecarb**;
