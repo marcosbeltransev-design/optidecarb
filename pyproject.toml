@@ -13,7 +13,9 @@ authors = [{ name = "Marcos Beltran" }]
 dependencies = [
   "numpy>=1.26,<3",
   "pandas>=2.2,<4",
-  "scipy>=1.13,<2",
+  # Pin the validated SciPy/HiGHS interface so strict regression dispatches
+  # remain reproducible across CI and deployment environments.
+  "scipy==1.17.0",
 ]
 
 [project.optional-dependencies]
