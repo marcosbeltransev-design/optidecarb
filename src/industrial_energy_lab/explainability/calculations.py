@@ -88,7 +88,7 @@ def explain_calculation(
             (("Grid import", grid, "MWh"), ("Grid emission factor", ef, "kgCO₂/MWh")),
             f"{grid:,.2f} MWh × {ef:,.2f} kgCO₂/MWh / 1,000 = {emissions:,.2f} tCO₂",
             emissions, "tCO₂/year",
-            "IEL gives no CO₂ credit for exported electricity in v1.1.",
+            "OptiDecarb gives no CO₂ credit for exported electricity in the current model.",
             "MWh × kgCO₂/MWh = kgCO₂; /1,000 = tCO₂",
         )
 

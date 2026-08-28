@@ -208,7 +208,7 @@ def _run_current_optimization(st, *, target: float | None = None) -> None:
 
 def _render_header(st, section: str) -> None:
     bundle = _bundle(st)
-    st.title("Industrial Energy Lab")
+    st.title("OptiDecarb")
     st.caption("Industrial Decarbonization & Techno-Economic Screening")
     if bundle.case_id == DEFAULT_CASE_ID:
         st.info(
@@ -236,7 +236,7 @@ def _overview(st) -> None:
         "change under explicit CO₂-reduction targets?"
     )
     st.markdown(
-        "Industrial Energy Lab is a **pre-feasibility screening tool**, not detailed "
+        "OptiDecarb is a **pre-feasibility screening tool**, not detailed "
         "engineering, FEED, financial advice, a control system, or a certified energy model."
     )
     bundle = _bundle(st)
@@ -270,7 +270,7 @@ def _overview(st) -> None:
 
 
     if st.session_state.get("learning_mode", True):
-        st.subheader("How Industrial Energy Lab works")
+        st.subheader("How OptiDecarb works")
         st.markdown(
             "**PUBLIC DATA / ASSUMPTIONS** → **VALIDATION** → **8,760-HOUR CASE** → "
             "**BASELINE** → **PV + BATTERY MODEL** → **LP OPTIMIZATION** → "
@@ -287,7 +287,7 @@ def _overview(st) -> None:
             st.write("Self-consumption asks where PV goes; self-sufficiency asks how much site demand avoids the grid.")
         with c3:
             st.markdown("**Pre-feasibility**")
-            st.write("IEL screens options and assumptions; it does not replace detailed engineering or an investment decision.")
+            st.write("OptiDecarb screens options and assumptions; it does not replace detailed engineering or an investment decision.")
 
 
 def _input_number(st, label: str, metric_id: str, value: float, *, min_value: float, step: float, key: str, format: str | None = None):
@@ -767,7 +767,7 @@ def _learning_lab(st) -> None:
                     st.write(f"**Your PV prediction:** {predicted_pv} · **Your battery prediction:** {predicted_battery}")
                     for text in explain_scenario_change(reference, candidate):
                         st.info(text)
-                    st.warning("Screening question: do these results justify collecting real site data, quotations and completing detailed engineering? IEL does not answer 'build now'.")
+                    st.warning("Screening question: do these results justify collecting real site data, quotations and completing detailed engineering? OptiDecarb does not answer 'build now'.")
                 else:
                     _result_error(st, candidate)
             except ValueError as exc:
@@ -884,9 +884,9 @@ def _methodology(st) -> None:
                 st.markdown(term_help(term_id))
         st.subheader("Public evidence vs representative model vs real plant data")
         st.dataframe(pd.DataFrame([
-            {"layer": "Public sector data", "meaning": "Published aggregate evidence", "IEL v1": "Yes"},
-            {"layer": "Representative model", "meaning": "Constructed case calibrated to public evidence", "IEL v1": "Yes"},
-            {"layer": "Real plant data", "meaning": "Facility-specific measurements/contracts", "IEL v1": "No"},
+            {"layer": "Public sector data", "meaning": "Published aggregate evidence", "OptiDecarb v1": "Yes"},
+            {"layer": "Representative model", "meaning": "Constructed case calibrated to public evidence", "OptiDecarb v1": "Yes"},
+            {"layer": "Real plant data", "meaning": "Facility-specific measurements/contracts", "OptiDecarb v1": "No"},
         ]), use_container_width=True, hide_index=True)
     guide = Path(ROOT / "docs" / "OPTIMIZATION_GUIDE.md")
     method = Path(ROOT / "METHODOLOGY.md")
@@ -899,10 +899,10 @@ def _methodology(st) -> None:
 def main() -> None:
     import streamlit as st
 
-    st.set_page_config(page_title="Industrial Energy Lab", page_icon="⚡", layout="wide")
+    st.set_page_config(page_title="OptiDecarb", page_icon="⚡", layout="wide")
     _state_defaults(st)
     with st.sidebar:
-        st.header("Industrial Energy Lab")
+        st.header("OptiDecarb")
         st.session_state.learning_mode = st.toggle(
             "Learning mode", value=bool(st.session_state.get("learning_mode", True)),
             help="Show extra explanations, examples and glossary content. Engineering calculations are unchanged.",

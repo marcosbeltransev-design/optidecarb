@@ -1,6 +1,6 @@
 # Representative Ceramic Plant — Castellón, Spain
 
-**Industrial Energy Lab v1.0 public-data-calibrated case study**
+**OptiDecarb public-data-calibrated case study**
 
 > This representative case is constructed from public sector data and explicit modelling assumptions. It does not reproduce the operations, costs or energy consumption of any individual ceramic company.
 
@@ -8,7 +8,7 @@
 
 ## 1. Executive summary
 
-Industrial Energy Lab (IEL) is a **pre-feasibility** screening tool: it helps identify promising configurations and important assumptions before detailed engineering. The case combines a deterministic 8,760-hour representative industrial electricity load, a Castellón solar profile calibrated to PVGIS-derived public information, a 2025 Spanish wholesale-price proxy calibrated to OMIE, and traceable screening assumptions.
+OptiDecarb is a **pre-feasibility** screening tool: it helps identify promising configurations and important assumptions before detailed engineering. The case combines a deterministic 8,760-hour representative industrial electricity load, a Castellón solar profile calibrated to PVGIS-derived public information, a 2025 Spanish wholesale-price proxy calibrated to OMIE, and traceable screening assumptions.
 
 The economic optimum under the frozen case assumptions is approximately **2.97 MW of photovoltaic (PV) capacity and no battery**. It reduces modeled grid imports and grid-related CO₂-equivalent emissions by about **30.4%** while lowering equivalent annualized cost. A minimum **40% CO₂ reduction** becomes binding and causes storage to enter the minimum-cost feasible solution.
 
@@ -22,7 +22,7 @@ The case therefore asks a narrow question: how might the **electrical** subsyste
 
 ## 3. Data vocabulary
 
-IEL distinguishes four evidence types:
+OptiDecarb distinguishes four evidence types:
 
 | Classification | Meaning | Example in this case |
 |---|---|---|
@@ -80,7 +80,7 @@ The profile is calibrated to approximately **1,616.8 kWh/kWp/year** and monthly 
 
 ## 6. Electricity prices
 
-OMIE reports a 2025 Spanish day-ahead annual average of **65.28 €/MWh**. IEL preserves the documented monthly means and constructs deterministic intra-month hourly variation.
+OMIE reports a 2025 Spanish day-ahead annual average of **65.28 €/MWh**. OptiDecarb preserves the documented monthly means and constructs deterministic intra-month hourly variation.
 
 This series is explicitly a:
 
@@ -92,7 +92,7 @@ The case uses **0 €/MWh export value** as a conservative model assumption. It 
 
 ## 7. Grid emissions
 
-Red Eléctrica reports **272,201 GWh** of Spanish national generation and **29.5 million tCO₂eq** of generation emissions for 2025. IEL derives:
+Red Eléctrica reports **272,201 GWh** of Spanish national generation and **29.5 million tCO₂eq** of generation emissions for 2025. OptiDecarb derives:
 
 ```text
 29.5e6 tCO2eq / 272.201e6 MWh
@@ -102,7 +102,7 @@ Red Eléctrica reports **272,201 GWh** of Spanish national generation and **29.5
 
 This is therefore a **derived public value**, not a factor quoted directly from the source.
 
-IEL uses:
+OptiDecarb uses:
 
 ```text
 Grid-related CO2 = grid imports × grid emission factor
@@ -149,7 +149,7 @@ The baseline cost is only the modeled hourly energy component under the OMIE-cal
 
 ## 10. Economic optimum
 
-IEL uses **LP — Linear Programming**. The optimizer chooses decision variables such as PV capacity, battery energy/power and hourly dispatch while obeying constraints such as energy balance, PV availability, battery power, **SOC — State of Charge** limits and optional carbon targets.
+OptiDecarb uses **LP — Linear Programming**. The optimizer chooses decision variables such as PV capacity, battery energy/power and hourly dispatch while obeying constraints such as energy balance, PV availability, battery power, **SOC — State of Charge** limits and optional carbon targets.
 
 The **objective function** is total annualized cost.
 
@@ -253,4 +253,4 @@ These results are consistent with the expected screening relationships: higher e
 
 It does not prove that a real ceramic factory should install 2.97 MW PV, that batteries are uneconomic, or that a 40% reduction target will always require storage. Those conclusions would require facility-specific load data, site constraints, actual commercial terms and detailed engineering.
 
-The defensible claim is narrower: **under a transparent, public-data-calibrated representative electrical case, IEL produces reproducible and interpretable pre-feasibility results.**
+The defensible claim is narrower: **under a transparent, public-data-calibrated representative electrical case, OptiDecarb produces reproducible and interpretable pre-feasibility results.**

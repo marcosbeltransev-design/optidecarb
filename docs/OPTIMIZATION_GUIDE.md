@@ -1,4 +1,4 @@
-# Optimization Guide — Industrial Energy Lab
+# Optimization Guide — OptiDecarb
 
 This guide explains the Iteration 3 model for an engineering reader who is learning optimization. It is intentionally shorter and more intuitive than `METHODOLOGY.md`.
 
@@ -6,7 +6,7 @@ This guide explains the Iteration 3 model for an engineering reader who is learn
 
 A linear program (LP) chooses values for **decision variables** while respecting **constraints** and minimizing or maximizing an **objective function**.
 
-Industrial Energy Lab asks:
+OptiDecarb asks:
 
 > Which PV size, battery size and hourly operating schedule give the lowest equivalent annual cost while obeying energy physics and optional CO2 requirements?
 

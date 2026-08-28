@@ -1,6 +1,6 @@
 # Castellón representative ceramic case
 
-This directory contains the frozen **`ceramic-castellon-v1`** public-data-calibrated electrical case used by Industrial Energy Lab v1.0.
+This directory contains the frozen **`ceramic-castellon-v1`** public-data-calibrated electrical case used by OptiDecarb.
 
 - `case_config.json` — explicit case parameters and source links.
 - `sources.json` — provenance registry distinguishing external data, derived values, proxies and assumptions.

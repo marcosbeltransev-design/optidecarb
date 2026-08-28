@@ -1,4 +1,4 @@
-# Industrial Energy Lab v1.0 — Validation Record
+# OptiDecarb v1.0 — Validation Record
 
 ## Scope
 
@@ -56,7 +56,7 @@ The application code imports Streamlit lazily, compiles, and UI service tests pa
 
 ## Deployment limitation
 
-A standalone `marcosbeltransev-design/industrial-energy-lab` GitHub repository is not currently exposed through the connected GitHub integration. `notas-albinegras` is deliberately not reused. Public Streamlit deployment therefore remains an external post-v1 presentation step.
+A standalone `marcosbeltransev-design/optidecarb` GitHub repository is not currently exposed through the connected GitHub integration. `notas-albinegras` is deliberately not reused. Public Streamlit deployment therefore remains an external post-v1 presentation step.
 
 ## Iteration 6 decision
 

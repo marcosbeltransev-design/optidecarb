@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1 — OptiDecarb rebrand
+
+- renamed the public product from **Industrial Energy Lab** to **OptiDecarb**;
+- changed the recommended GitHub/Streamlit slug to `optidecarb`;
+- updated Streamlit titles, documentation, tests, source attribution and portfolio wording;
+- retained the internal Python module `industrial_energy_lab` for backward-compatible imports;
+- no physical, economic or optimization equations changed; model version remains **0.3.0**.
+
 ## 1.1.0 — Student Learning Lab
 
 ### Added

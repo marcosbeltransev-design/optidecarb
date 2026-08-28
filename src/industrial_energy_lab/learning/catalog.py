@@ -35,10 +35,10 @@ QUESTIONS = (
     LearningQuestion("baseline", "What is the baseline used for?", ("A comparison reference", "A forecast of the future", "A supplier quotation"), "A comparison reference", "Savings and CO₂ reduction need a consistent reference scenario."),
     LearningQuestion("binding", "If the economic optimum already reduces CO₂ by 30%, is a 20% minimum target usually binding?", ("Yes", "No"), "No", "The unconstrained optimum already exceeds the requirement, so that target does not restrict the solution." , "INTERMEDIATE"),
     LearningQuestion("infeasible", "What does an infeasible optimization mean?", ("The solver crashed", "No solution satisfies all current constraints", "The project has negative NPV"), "No solution satisfies all current constraints", "Infeasible is a mathematical status distinct from solver error." , "INTERMEDIATE"),
-    LearningQuestion("proxy", "How should the OMIE series be interpreted in the Castellón case?", ("Complete industrial electricity bill", "Wholesale energy-price proxy", "Real plant contract"), "Wholesale energy-price proxy", "IEL does not model supplier margins, demand charges, taxes or a real facility contract."),
+    LearningQuestion("proxy", "How should the OMIE series be interpreted in the Castellón case?", ("Complete industrial electricity bill", "Wholesale energy-price proxy", "Real plant contract"), "Wholesale energy-price proxy", "OptiDecarb does not model supplier margins, demand charges, taxes or a real facility contract."),
     LearningQuestion("derived", "A grid CO₂ factor calculated from published REE emissions and generation is what kind of value?", ("Real plant measurement", "Derived public value", "Random model assumption"), "Derived public value", "The ingredients are published; the final ratio is calculated by the model documentation."),
     LearningQuestion("optimum", "Does 'economic optimum' mean the system is best in every possible sense?", ("Yes", "No"), "No", "It is the minimum of the stated objective within the stated constraints and assumptions." , "INTERMEDIATE"),
-    LearningQuestion("pre_feasibility", "What is the right decision question for IEL?", ("Should we build immediately?", "Does this justify more detailed engineering?"), "Does this justify more detailed engineering?", "IEL is a screening tool, not detailed design or investment approval."),
+    LearningQuestion("pre_feasibility", "What is the right decision question for OptiDecarb?", ("Should we build immediately?", "Does this justify more detailed engineering?"), "Does this justify more detailed engineering?", "OptiDecarb is a screening tool, not detailed design or investment approval."),
     LearningQuestion("unit_co2", "180 kgCO₂/MWh × 1,000 MWh equals?", ("180 kgCO₂", "180 tCO₂", "180,000 tCO₂"), "180 tCO₂", "180,000 kgCO₂ divided by 1,000 kg/t = 180 tCO₂."),
 )
 
@@ -61,7 +61,7 @@ CASTELLON_WALKTHROUGH = (
     ("7. Why zero battery?", "Storage can shift PV surplus to later demand, but in the economic optimum its additional value is lower than its annualized cost plus losses under the tested assumptions."),
     ("8. Why does battery enter at 40% CO₂?", "The economic optimum already reduces electrical CO₂ by about 30%. A 40% minimum becomes binding, requiring deeper import reduction; more PV creates more surplus and storage becomes part of the least-cost feasible solution."),
     ("9. Why does 50% cost more?", "Deeper reductions shrink the feasible space and require more capital-intensive measures. The extra avoided CO₂ eventually has a positive marginal annualized cost."),
-    ("10. What should we not conclude?", "IEL does not prove that a real ceramic plant should install these exact capacities. Thermal processes, real contracts, site geometry and detailed engineering remain outside this screening model."),
+    ("10. What should we not conclude?", "OptiDecarb does not prove that a real ceramic plant should install these exact capacities. Thermal processes, real contracts, site geometry and detailed engineering remain outside this screening model."),
 )
 
 CONCEPT_DEPENDENCIES = (

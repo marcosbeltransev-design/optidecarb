@@ -11,7 +11,7 @@ from industrial_energy_lab.learning import (
 
 
 def main() -> None:
-    print("Industrial Energy Lab — Student examples")
+    print("OptiDecarb — Student examples")
     print(f"5 MW × 3 h = {energy_from_power(5, 3):.1f} MWh")
     print(f"4 MWh / 2 MW = {battery_duration_hours(4, 2):.1f} h")
     print(f"180 kgCO2/MWh × 1,000 MWh = {co2_from_grid_energy_tco2(1000, 180):.1f} tCO2")

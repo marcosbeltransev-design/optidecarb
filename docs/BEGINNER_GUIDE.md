@@ -1,6 +1,6 @@
-# Industrial Energy Lab — From Zero to Understanding the Model
+# OptiDecarb — From Zero to Understanding the Model
 
-This guide is the fastest route from basic engineering knowledge to understanding **why Industrial Energy Lab behaves the way it does**. For active practice, pair it with [`STUDENT_LAB.md`](STUDENT_LAB.md).
+This guide is the fastest route from basic engineering knowledge to understanding **why OptiDecarb behaves the way it does**. For active practice, pair it with [`STUDENT_LAB.md`](STUDENT_LAB.md).
 
 ## 1. Start with units: MW is not MWh
 
@@ -21,7 +21,7 @@ Think of the first relation as a dimensional sanity check: `MW × h = MWh`.
 
 ## 2. Why 8,760 hours?
 
-A non-leap year has `24 × 365 = 8,760` hours. IEL models the full year because annual averages cannot tell us **when** load, PV generation and electricity prices occur.
+A non-leap year has `24 × 365 = 8,760` hours. OptiDecarb models the full year because annual averages cannot tell us **when** load, PV generation and electricity prices occur.
 
 Timing matters for:
 
@@ -54,7 +54,7 @@ A battery needs two sizes:
 
 **SOC — State of Charge** is stored energy at a particular time.
 
-IEL models charge/discharge efficiency. Storage shifts energy; it does not create it.
+OptiDecarb models charge/discharge efficiency. Storage shifts energy; it does not create it.
 
 ### Cyclic SOC
 
@@ -66,7 +66,7 @@ The annual optimization requires the battery to end with the same SOC condition 
 
 After direct PV and battery discharge, remaining demand is imported from the grid. Surplus PV can be exported.
 
-The **baseline** is the reference case used for comparison. In IEL it is grid-only electricity supply for the same load and price series.
+The **baseline** is the reference case used for comparison. In OptiDecarb it is grid-only electricity supply for the same load and price series.
 
 Savings, emissions reduction and abatement cost only make sense relative to a clearly defined baseline.
 
@@ -82,7 +82,7 @@ A €2M PV system is not €2M/year.
 
 ### WACC
 
-**WACC — Weighted Average Cost of Capital** is the financing/discount rate used by IEL. Spanish clarification: *coste medio ponderado del capital*.
+**WACC — Weighted Average Cost of Capital** is the financing/discount rate used by OptiDecarb. Spanish clarification: *coste medio ponderado del capital*.
 
 It matters through this chain:
 
@@ -120,7 +120,7 @@ NPV = -initial CAPEX + Σ cash_flow[t] / (1+r)^t
 - NPV > 0: modeled discounted benefits exceed CAPEX under the assumptions;
 - NPV < 0: they do not.
 
-Positive NPV **does not mean “build the project.”** IEL is pre-feasibility.
+Positive NPV **does not mean “build the project.”** OptiDecarb is pre-feasibility.
 
 ### Payback
 
@@ -144,7 +144,7 @@ What the optimizer may choose, such as:
 Inputs the optimizer does not choose, such as WACC or PV unit CAPEX.
 
 ### Objective
-IEL minimizes equivalent **annualized system cost**:
+OptiDecarb minimizes equivalent **annualized system cost**:
 
 ```text
 annualized PV + battery cost
@@ -184,7 +184,7 @@ So almost all PV can stay onsite while most annual demand is still supplied by t
 
 ## 10. Carbon and abatement cost
 
-IEL v1.1 models electrical grid-related emissions as:
+OptiDecarb v1.1 models electrical grid-related emissions as:
 
 ```text
 CO₂ = grid import [MWh] × grid emission factor [kgCO₂/MWh] / 1,000
@@ -231,9 +231,9 @@ The economic optimum already reduces modeled electrical CO₂ by about 30%. At a
 
 Read [`../cases/ceramic_castellon/CASE_STUDY.md`](../cases/ceramic_castellon/CASE_STUDY.md) for the full evidence chain.
 
-## 14. What IEL does not know
+## 14. What OptiDecarb does not know
 
-IEL does not know the real plant's:
+OptiDecarb does not know the real plant's:
 
 - roof/land geometry;
 - electrical single-line diagram;
@@ -245,7 +245,7 @@ IEL does not know the real plant's:
 - kiln/dryer gas demand;
 - future market prices.
 
-That is why IEL is **pre-feasibility**: it asks whether a scenario justifies more detailed study.
+That is why OptiDecarb is **pre-feasibility**: it asks whether a scenario justifies more detailed study.
 
 ## 15. How to study
 

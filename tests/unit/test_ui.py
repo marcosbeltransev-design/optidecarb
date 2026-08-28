@@ -17,7 +17,7 @@ from industrial_energy_lab.ui.services import default_parameters, load_demo_bund
 
 
 def test_app_version_is_separate_from_engine_version():
-    assert APP_VERSION == "1.1.0"
+    assert APP_VERSION == "1.1.1"
 
 
 def test_metric_help_contains_learning_sections():

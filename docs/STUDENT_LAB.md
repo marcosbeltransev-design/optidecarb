@@ -1,4 +1,4 @@
-# Industrial Energy Lab — Student Learning Lab
+# OptiDecarb — Student Learning Lab
 
 A 30–60 minute guided practice for an engineering student who understands basic mathematics but is new to energy-system optimization.
 
@@ -110,7 +110,7 @@ WACC → CRF → annualized CAPEX → objective function → optimal sizing
 ```
 
 ### Definitions
-- **WACC — Weighted Average Cost of Capital:** financing/discount rate used in IEL. Spanish clarification: *coste medio ponderado del capital*.
+- **WACC — Weighted Average Cost of Capital:** financing/discount rate used in OptiDecarb. Spanish clarification: *coste medio ponderado del capital*.
 - **CRF — Capital Recovery Factor:** converts an upfront investment into an equivalent annual capital cost.
 - **CAPEX — Capital Expenditure:** upfront investment.
 
@@ -159,7 +159,7 @@ Classify each as a **decision variable**, **input parameter**, **constraint** or
 - carbon target → optional constraint parameter.
 
 ### Explanation
-“Optimal” means the minimum of the stated objective **inside the stated model**, not “best in every real-world sense.” IEL does not know roof geometry, real supplier quotations, detailed grid connection constraints or the plant's actual financing contract.
+“Optimal” means the minimum of the stated objective **inside the stated model**, not “best in every real-world sense.” OptiDecarb does not know roof geometry, real supplier quotations, detailed grid connection constraints or the plant's actual financing contract.
 
 ---
 
@@ -252,7 +252,7 @@ Validated engine → conditional result
 A good answer separates **evidence**, **derived values**, **proxies**, **model assumptions** and **results**.
 
 ### Explanation
-IEL is a **pre-feasibility** tool. The correct decision is whether a scenario is promising enough to justify real plant data, quotations and detailed engineering — not whether construction should start immediately.
+OptiDecarb is a **pre-feasibility** tool. The correct decision is whether a scenario is promising enough to justify real plant data, quotations and detailed engineering — not whether construction should start immediately.
 
 ---
 

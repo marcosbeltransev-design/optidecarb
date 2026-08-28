@@ -65,7 +65,7 @@
     "geography": "Spain bidding zone",
     "reference_year": 2025,
     "classification": "OFFICIAL DATA",
-    "license": "Public OMIE report; IEL stores transformed/calibrated summary statistics rather than redistributing a raw market dataset."
+    "license": "Public OMIE report; OptiDecarb stores transformed/calibrated summary statistics rather than redistributing a raw market dataset."
   },
   {
     "source_id": "pvgis_official",
@@ -154,9 +154,9 @@
   },
   {
     "source_id": "model_profile_shape",
-    "source_name": "Industrial Energy Lab",
+    "source_name": "OptiDecarb",
     "document_title": "Representative hourly load-shape assumption",
-    "publisher": "Industrial Energy Lab",
+    "publisher": "OptiDecarb",
     "publication_date": "2026-08-27",
     "access_date": "2026-08-27",
     "url": null,
@@ -171,9 +171,9 @@
   },
   {
     "source_id": "model_finance",
-    "source_name": "Industrial Energy Lab",
+    "source_name": "OptiDecarb",
     "document_title": "Screening finance assumptions",
-    "publisher": "Industrial Energy Lab",
+    "publisher": "OptiDecarb",
     "publication_date": "2026-08-27",
     "access_date": "2026-08-27",
     "url": null,
@@ -188,9 +188,9 @@
   },
   {
     "source_id": "model_battery_decomposition",
-    "source_name": "Industrial Energy Lab",
+    "source_name": "OptiDecarb",
     "document_title": "Battery cost decomposition assumption",
-    "publisher": "Industrial Energy Lab",
+    "publisher": "OptiDecarb",
     "publication_date": "2026-08-27",
     "access_date": "2026-08-27",
     "url": null,
@@ -205,9 +205,9 @@
   },
   {
     "source_id": "model_export_price",
-    "source_name": "Industrial Energy Lab",
+    "source_name": "OptiDecarb",
     "document_title": "Conservative export-value assumption",
-    "publisher": "Industrial Energy Lab",
+    "publisher": "OptiDecarb",
     "publication_date": "2026-08-27",
     "access_date": "2026-08-27",
     "url": null,

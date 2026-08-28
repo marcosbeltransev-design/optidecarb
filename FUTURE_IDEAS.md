@@ -23,9 +23,9 @@ After Iteration 5, at most one major extension should be evaluated, and only aft
 
 # Post-v1 roadmap — not implemented
 
-Industrial Energy Lab v1.0 is intentionally complete at the electrical pre-feasibility boundary. Future work must be justified by a real use case and reliable data.
+OptiDecarb v1.1 is intentionally complete at the electrical pre-feasibility boundary. Future work must be justified by a real use case and reliable data.
 
-## Possible v1.1 — deployment / presentation polish
+## Possible v1.2 — deployment / presentation polish
 
 - public GitHub repository and CI once remote creation is available;
 - Streamlit Community Cloud deployment and browser QA;

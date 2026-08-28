@@ -21,6 +21,6 @@ The current sandbox cannot resolve/download the Streamlit package, including via
 
 ## Deployment boundary
 
-Public Streamlit Community Cloud deployment also requires a standalone GitHub repository. The connected GitHub integration currently exposes only the unrelated `notas-albinegras` repository and does not expose repository creation. Industrial Energy Lab is deliberately not mixed into that project.
+Public Streamlit Community Cloud deployment also requires a standalone GitHub repository. The connected GitHub integration currently exposes only the unrelated `notas-albinegras` repository and does not expose repository creation. OptiDecarb is deliberately not mixed into that project.
 
 These two constraints are external deployment/acceptance boundaries. The v0.4 code is frozen so Iteration 5 can proceed without turning the UI into an open-ended redesign cycle.

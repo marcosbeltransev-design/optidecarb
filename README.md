@@ -1,8 +1,10 @@
-# Industrial Energy Lab
+# OptiDecarb
 
 **Industrial Decarbonization & Techno-Economic Screening**
 
-Industrial Energy Lab (IEL) is an offline-first Python **pre-feasibility** tool for industrial **electrical** decarbonization. It combines validated 8,760-hour energy balances, photovoltaic (PV) generation, battery storage, grid exchange, transparent economics, linear programming (LP), carbon constraints, deterministic sensitivity analysis, explainability, and a public-data-calibrated representative ceramic-industry case for Castellón, Spain.
+> **Branding note:** the public project name is **OptiDecarb**. The internal Python import namespace remains `industrial_energy_lab` for backward compatibility with the validated codebase.
+
+OptiDecarb is an offline-first Python **pre-feasibility** tool for industrial **electrical** decarbonization. It combines validated 8,760-hour energy balances, photovoltaic (PV) generation, battery storage, grid exchange, transparent economics, linear programming (LP), carbon constraints, deterministic sensitivity analysis, explainability, and a public-data-calibrated representative ceramic-industry case for Castellón, Spain.
 
 > **v1.1 scope:** electricity + PV + battery + grid, plus a deterministic Student Learning Lab. Thermal process energy, kilns, dryers and natural-gas consumption are outside the model boundary.
 
@@ -12,7 +14,7 @@ Industrial Energy Lab (IEL) is an offline-first Python **pre-feasibility** tool 
 
 > Given an industrial hourly electricity demand profile, what PV and battery configuration minimizes equivalent annual energy-system cost, and how does that solution change under explicit CO₂-reduction targets?
 
-IEL jointly chooses:
+OptiDecarb jointly chooses:
 
 - PV capacity [kW/MW];
 - battery energy capacity [kWh/MWh];
@@ -35,7 +37,7 @@ Start here:
 
 The Streamlit interface also exposes a **Learning mode**, contextual `?` help and a dedicated **Student Learning Lab**. Definitions come from central registries, while worked calculations use the active solved result rather than copied example text.
 
-## Learn with Industrial Energy Lab
+## Learn with OptiDecarb
 
 v1.1 adds active learning without changing the engineering model:
 
@@ -50,7 +52,7 @@ v1.1 adds active learning without changing the engineering model:
 
 The learning objective is not to memorize rules such as “higher WACC = less PV”. It is to trace the chain **WACC → CRF → annualized CAPEX → objective → optimal sizing**, run a controlled experiment, and interpret the actual solved result conditionally.
 
-## How IEL works
+## How OptiDecarb works
 
 ```text
 PUBLIC DATA + EXPLICIT ASSUMPTIONS
@@ -184,7 +186,7 @@ Deterministic, one-at-a-time, **on-demand** families:
 - grid-emission factor;
 - carbon target.
 
-IEL intentionally does not run every sensitivity family on every UI rerun.
+OptiDecarb intentionally does not run every sensitivity family on every UI rerun.
 
 ### Explainability
 
@@ -343,7 +345,7 @@ Golden Cases v1–v3 protect the synthetic engine history. `ceramic_castellon_ca
 
 ## Versioning
 
-- application/package: **v1.1.0**;
+- application/package: **v1.1.1**;
 - optimization model: **v0.3.0**;
 - representative case: **ceramic-castellon-v1**;
 - representative dataset: **ceramic-castellon-2025-v1**.
@@ -352,7 +354,7 @@ The model version remains 0.3.0 because v1.1 adds education/UI services rather t
 
 ## Important limitations
 
-IEL v1 does **not** model:
+OptiDecarb v1 does **not** model:
 
 - ceramic thermal-process energy, kilns, dryers or natural gas;
 - plant-specific measured data or contracts;
@@ -372,4 +374,4 @@ These limits are intentional. **Depth, traceability and a finished v1 are prefer
 
 ## License
 
-MIT. External source data remain subject to their respective source terms; IEL stores provenance and calibrated/derived case values rather than claiming ownership of external datasets.
+MIT. External source data remain subject to their respective source terms; OptiDecarb stores provenance and calibrated/derived case values rather than claiming ownership of external datasets.

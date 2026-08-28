@@ -1,4 +1,4 @@
-# Industrial Energy Lab v1.1 — Student Learning Lab validation
+# OptiDecarb v1.1 — Student Learning Lab validation
 
 ## Scope
 

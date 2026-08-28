@@ -1,4 +1,4 @@
-"""Industrial Energy Lab core package."""
+"""OptiDecarb core package."""
 
 from industrial_energy_lab.utils.version import CASE_VERSION, DATASET_VERSION, MODEL_VERSION
 

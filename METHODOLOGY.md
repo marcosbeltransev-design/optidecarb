@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-Industrial Energy Lab is an electrical **pre-feasibility screening** model. Iteration 1 defines the grid-only baseline, Iteration 2 validates deterministic PV+battery physics for user-defined sizes, and Iteration 3 adds linear techno-economic sizing/dispatch optimization, carbon constraints, deterministic sensitivity, and explainability.
+OptiDecarb is an electrical **pre-feasibility screening** model. Iteration 1 defines the grid-only baseline, Iteration 2 validates deterministic PV+battery physics for user-defined sizes, and Iteration 3 adds linear techno-economic sizing/dispatch optimization, carbon constraints, deterministic sensitivity, and explainability.
 
 No thermal process, hydrogen, cogeneration, network power flow, tax model, detailed tariff model, degradation model, or investment recommendation is included.
 

@@ -1,6 +1,6 @@
 """Thin orchestration layer for Student Learning Lab.
 
-The learning UI calls the same validated engine as the rest of IEL. Full 8,760-hour
+The learning UI calls the same validated engine as the rest of OptiDecarb. Full 8,760-hour
 experiments are deliberately on demand and change one assumption at a time.
 """
 from __future__ import annotations
