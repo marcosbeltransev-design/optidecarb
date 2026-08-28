@@ -25,6 +25,9 @@ from industrial_energy_lab.ui import APP_VERSION
 from industrial_energy_lab.ui import v12_app as base
 from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
+_BASE_PAGE = base._page
+V13_SECTIONS = tuple("Industrial Energy Junior Lab" if section == "Junior Engineer Lab" else section for section in base.SECTIONS)
+
 
 def _diagnostic(st) -> None:
     st.subheader("Industrial Energy Diagnostic — 10–15 minutes")
@@ -334,8 +337,18 @@ def _about_v13(st) -> None:
     st.write("The learning layer is intentionally focused on industrial electricity: load and metering, data quality, PV/BESS, electricity economics, optimization, carbon, site/project constraints, supplier review and energy recommendations. General career content is kept only when it directly supports an energy-engineering task. The mathematical model remains v0.3.0.")
 
 
+def _v13_page_router(st, section: str) -> None:
+    if section == "Industrial Energy Junior Lab":
+        return _junior_lab_v13(st)
+    if section == "About OptiDecarb":
+        return _about_v13(st)
+    return _BASE_PAGE(st, section)
+
+
 def main() -> None:
     """Run the validated v1.2 UI shell with the energy-focused v1.3 learning layer."""
+    base.SECTIONS = V13_SECTIONS
+    base._page = _v13_page_router
     base._junior_lab = _junior_lab_v13
     base._about = _about_v13
     base.main()
