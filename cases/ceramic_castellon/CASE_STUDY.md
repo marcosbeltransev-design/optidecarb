@@ -4,7 +4,7 @@
 
 > This representative case is constructed from public sector data and explicit modelling assumptions. It does not reproduce the operations, costs or energy consumption of any individual ceramic company.
 
-> This case evaluates the **electrical subsystem** of a representative ceramic plant. Thermal process energy, kilns, dryers and natural-gas consumption are outside the v1 model scope.
+> This case evaluates the **electrical subsystem** of a representative ceramic plant. Thermal process energy, kilns, dryers and natural-gas consumption are outside the current model scope.
 
 ## 1. Executive summary
 
@@ -13,6 +13,20 @@ OptiDecarb is a **pre-feasibility** screening tool: it helps identify promising 
 The economic optimum under the frozen case assumptions is approximately **2.97 MW of photovoltaic (PV) capacity and no battery**. It reduces modeled grid imports and grid-related CO₂-equivalent emissions by about **30.4%** while lowering equivalent annualized cost. A minimum **40% CO₂ reduction** becomes binding and causes storage to enter the minimum-cost feasible solution.
 
 This is a screening result, not a construction recommendation.
+
+### How a junior engineer should communicate it
+
+A better professional sentence is:
+
+> Under the current assumptions, **around 3 MWp of PV** appears economically attractive for this representative case. Battery storage is not selected in the base economic optimum, but it becomes useful under stricter carbon targets. The result supports further study, not immediate construction.
+
+Do **not** interpret `2.972 MW` as a build-ready precision level. A real company would next validate the site layout, actual electricity contract, grid/export conditions and supplier quotations.
+
+### Can we trust the result?
+
+- **Useful for screening:** yes.
+- **Ready for investment approval:** no.
+- **Main reason:** the case uses public evidence, proxies and representative assumptions rather than real facility measurements and contracts.
 
 ## 2. Why Castellón ceramics?
 

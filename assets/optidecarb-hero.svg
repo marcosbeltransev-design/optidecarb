@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 430" role="img" aria-label="Industrial energy learning illustration">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#edf7ff"/><stop offset="1" stop-color="#f9fcff"/></linearGradient>
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#b9d5ef" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1600" height="430" rx="28" fill="url(#sky)"/>
+  <rect width="1600" height="430" rx="28" fill="url(#grid)" opacity=".55"/>
+  <path d="M95 155l250-28 250 56 210-80" fill="none" stroke="#16a35b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M783 92l35 20-36 19z" fill="#16a35b"/>
+  <g fill="#2b73b9" stroke="#d8ecff" stroke-width="2" transform="translate(145 230) skewX(-10)">
+    <rect width="120" height="64"/><rect x="130" width="120" height="64"/><rect x="260" width="120" height="64"/><rect x="390" width="120" height="64"/>
+    <rect y="72" width="120" height="64"/><rect x="130" y="72" width="120" height="64"/><rect x="260" y="72" width="120" height="64"/><rect x="390" y="72" width="120" height="64"/>
+  </g>
+  <g transform="translate(760 246)">
+    <rect x="0" y="0" width="56" height="92" rx="8" fill="#eafff2" stroke="#16a35b" stroke-width="5"/><rect x="18" y="-13" width="20" height="13" fill="#16a35b"/><path d="M16 47h24" stroke="#16a35b" stroke-width="5"/>
+    <rect x="70" y="0" width="56" height="92" rx="8" fill="#eafff2" stroke="#16a35b" stroke-width="5"/><rect x="88" y="-13" width="20" height="13" fill="#16a35b"/><path d="M86 47h24" stroke="#16a35b" stroke-width="5"/>
+  </g>
+  <g fill="#a9c4df" stroke="#5f8db8" stroke-width="4">
+    <rect x="900" y="220" width="150" height="116" rx="10"/>
+    <rect x="1065" y="168" width="210" height="168" rx="10"/>
+    <rect x="1290" y="240" width="130" height="96" rx="10"/>
+  </g>
+  <g fill="#7698ba"><rect x="1112" y="88" width="40" height="112"/><rect x="1200" y="118" width="40" height="82"/></g>
+  <g stroke="#416b9a" stroke-width="5" fill="none"><path d="M1460 100l-54 236h108z"/><path d="M1425 165h70M1415 235h90M1390 302h140"/></g>
+  <text x="92" y="72" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#0d2d55">From hourly data to better industrial energy decisions</text>
+  <text x="92" y="108" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#416b9a">PV · battery · grid · economics · CO₂ · engineering judgement</text>
+</svg>

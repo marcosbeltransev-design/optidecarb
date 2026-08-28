@@ -1,5 +1,13 @@
 # Methodology — Iterations 1–3
 
+## Read this first — the model in plain English
+
+OptiDecarb looks at one year of hourly industrial electricity demand. It can add PV and battery storage, then uses **Linear Programming (LP)** to choose capacities and hourly operation that minimize annualized cost while respecting energy and optional CO₂ constraints.
+
+The key professional idea is conditionality: an “optimal” result is only optimal for the **data, assumptions, objective, constraints and model boundary that were provided**. That is why v1.2 pairs the equations below with sanity checks, sensitivity analysis and professional next-step guidance.
+
+The learning / industry layers do not change the equations in Model v0.3.0.
+
 ## 1. Scope
 
 OptiDecarb is an electrical **pre-feasibility screening** model. Iteration 1 defines the grid-only baseline, Iteration 2 validates deterministic PV+battery physics for user-defined sizes, and Iteration 3 adds linear techno-economic sizing/dispatch optimization, carbon constraints, deterministic sensitivity, and explainability.
@@ -404,43 +412,19 @@ Pyomo + HiGHS remains architecturally possible, but adding an untested dependenc
 
 ## 22. Validation strategy
 
-Tests cover all previous iterations plus:
-
-- hand-computable no-investment optimum;
-- hand-computable PV optimum;
-- cheap-storage entry;
-- manually known carbon-constrained optimum;
-- infeasible target distinction;
-- cyclic SOC;
-- energy conservation;
-- no material simultaneous flows;
-- input validation and anti-arbitrage price ordering;
-- metric registry completeness and relationship validity;
-- deterministic result insights;
-- frontier reuse of non-binding economic optimum;
-- break-even transition logic;
-- Golden Case v3 economic optimum;
-- Golden Case v3 binding 40% carbon case.
-
+Tests cover all previous iterations plus hand-computable no-investment and PV optima, cheap-storage entry, manually known carbon-constrained optimum, infeasible target distinction, cyclic SOC, energy conservation, no material simultaneous flows, input validation and anti-arbitrage price ordering, metric registry completeness, deterministic insights, frontier reuse, break-even transition logic and Golden Case v3.
 
 ## 23. Streamlit presentation boundary
 
-Iteration 4 does not change the mathematical model. The UI calls the same validated baseline and optimization services used by tests. Input widgets collect explicit assumptions; a form submit triggers a solve; charts and cards render returned values.
+The UI does not change the mathematical model. It calls the same validated baseline and optimization services used by tests. Input widgets collect explicit assumptions; a form submit triggers a solve; charts and cards render returned values.
 
-The interface deliberately distinguishes:
-
-- **model assumption** — a user-editable or synthetic validation input;
-- **dataset value** — a value read from a versioned offline snapshot;
-- **calculated result** — an output produced by the engine.
-
-Important inputs and outputs receive educational help from the centralized metric registry. The help describes what a quantity is, its units, why it matters, its calculation, interpretation, relationships and material caveats. The UI does not use generative AI to explain results.
-
+The interface distinguishes model assumptions, dataset values and calculated results. Important inputs and outputs receive educational help from the centralized metric registry. The UI does not use generative AI to explain results.
 
 ---
 
 # v1.0 representative-case methodology
 
-The optimization equations remain model version **0.3.0**. The v1.0 application adds a public-data-calibrated case layer without changing the mathematical model.
+The optimization equations remain model version **0.3.0**. The representative application adds a public-data-calibrated case layer without changing the mathematical model.
 
 ## Evidence classes
 

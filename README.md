@@ -1,56 +1,76 @@
+![OptiDecarb](assets/optidecarb-logo.svg)
+
 # OptiDecarb
 
-**Industrial Decarbonization & Techno-Economic Screening**
+**Industrial Energy Optimization & Learning for Future Engineers**
+
+**Live app:** https://optidecarb.streamlit.app
 
 > **Branding note:** the public project name is **OptiDecarb**. The internal Python import namespace remains `industrial_energy_lab` for backward compatibility with the validated codebase.
 
-OptiDecarb is an offline-first Python **pre-feasibility** tool for industrial **electrical** decarbonization. It combines validated 8,760-hour energy balances, photovoltaic (PV) generation, battery storage, grid exchange, transparent economics, linear programming (LP), carbon constraints, deterministic sensitivity analysis, explainability, and a public-data-calibrated representative ceramic-industry case for Castellón, Spain.
+OptiDecarb is an offline-first Python **screening / pre-feasibility** tool for industrial **electrical** decarbonization. It combines a validated 8,760-hour energy model, PV and battery optimization, transparent economics, CO₂ constraints, sensitivity analysis and a public-data-calibrated representative ceramic-industry case for Castellón, Spain.
 
-> **v1.1 scope:** electricity + PV + battery + grid, plus a deterministic Student Learning Lab. Thermal process energy, kilns, dryers and natural-gas consumption are outside the model boundary.
+From **v1.2**, the project is also an engineering learning environment. It is designed to help a student understand not only what the model calculates, but also what a useful junior engineer should check, ask, challenge and communicate before a company makes a real decision.
+
+> **Model scope:** electricity + PV + battery + grid. Thermal process energy, kilns, dryers and natural-gas consumption remain outside the current model boundary.
 
 > **Case disclaimer:** The Castellón representative case is constructed from public sector data and explicit modelling assumptions. It does not reproduce the operations, costs or energy consumption of any individual ceramic company.
 
-## What problem does it solve?
+## The learning goal
+
+OptiDecarb should not teach a student to **sound** experienced. It should help them **think clearly**:
+
+```text
+UNDERSTAND → QUESTION → CHECK → MODEL → CHALLENGE → INTERPRET → COMMUNICATE → NEXT STEP
+```
+
+Examples of the questions v1.2 trains:
+
+- Where did this number come from?
+- Is it measured, derived, a proxy or an assumption?
+- Do the units and order of magnitude make sense?
+- Can I trust this result yet?
+- Is the optimum being limited by a model bound?
+- What would finance, operations or sustainability ask?
+- What should I ask a supplier?
+- What would a company normally do next?
+- How can I explain the result in simple professional English?
+
+## What problem does the engineering model solve?
 
 > Given an industrial hourly electricity demand profile, what PV and battery configuration minimizes equivalent annual energy-system cost, and how does that solution change under explicit CO₂-reduction targets?
 
-OptiDecarb jointly chooses:
+OptiDecarb jointly chooses PV capacity, battery energy/power capacity and hourly dispatch. Grid imports and PV exports follow from the hourly energy balance. The optimizer minimizes **total annualized cost**. Net Present Value (NPV) and simple payback are calculated afterwards as complementary screening indicators.
 
-- PV capacity [kW/MW];
-- battery energy capacity [kWh/MWh];
-- battery power capacity [kW/MW];
-- hourly PV allocation;
-- hourly battery charge/discharge;
-- hourly state of charge (SOC).
+## Learn with OptiDecarb v1.2
 
-Grid imports and PV exports are calculated consistently from hourly residual balances. The optimizer minimizes **total annualized cost**. Net present value (NPV) and simple payback are calculated afterwards as complementary screening indicators.
+The app now combines four layers:
 
-## New to energy optimization?
+1. **Engineering model** — validated 8,760-hour PV/battery/grid model and LP optimization.
+2. **Learning Lab** — worked calculations, guided experiments and concept checks.
+3. **Junior Engineer Lab** — imperfect data, sanity checks, client situations, supplier questions, stakeholder thinking and professional communication.
+4. **Clear professional English** — easy explanation first, professional term second, optional deeper technical detail after that.
 
-Start here:
+Professional vocabulary is intentionally kept in English because the tool is designed for international engineering work. Difficult terms may include a short Spanish clarification when it genuinely helps.
 
-- [`docs/BEGINNER_GUIDE.md`](docs/BEGINNER_GUIDE.md) — power vs energy, PV, batteries, economics, optimization and carbon from zero;
-- [`docs/STUDENT_LAB.md`](docs/STUDENT_LAB.md) — eight guided exercises with worked calculations and suggested answers;
-- [`docs/OPTIMIZATION_GUIDE.md`](docs/OPTIMIZATION_GUIDE.md) — the LP formulation in engineering language;
-- [`docs/INTERVIEW_GUIDE.md`](docs/INTERVIEW_GUIDE.md) — short/deeper answers to common technical interview questions;
-- [`cases/ceramic_castellon/CASE_STUDY.md`](cases/ceramic_castellon/CASE_STUDY.md) — the complete representative Castellón case.
+## Recommended study route
 
-The Streamlit interface also exposes a **Learning mode**, contextual `?` help and a dedicated **Student Learning Lab**. Definitions come from central registries, while worked calculations use the active solved result rather than copied example text.
+- [`docs/BEGINNER_GUIDE.md`](docs/BEGINNER_GUIDE.md) — foundations in clear English;
+- in-app **Learning Lab** — predict, experiment and explain;
+- in-app **Junior Engineer Lab** — real-work judgement practice;
+- [`docs/JUNIOR_ENGINEER_GUIDE.md`](docs/JUNIOR_ENGINEER_GUIDE.md) — how to approach an early industrial-energy study;
+- [`docs/INDUSTRY_CASES.md`](docs/INDUSTRY_CASES.md) — eight realistic junior mini-cases;
+- [`cases/ceramic_castellon/CASE_STUDY.md`](cases/ceramic_castellon/CASE_STUDY.md) — representative Castellón case;
+- [`docs/STUDENT_LAB.md`](docs/STUDENT_LAB.md) — guided technical exercises;
+- [`docs/OPTIMIZATION_GUIDE.md`](docs/OPTIMIZATION_GUIDE.md) — deeper LP formulation;
+- [`docs/INTERVIEW_GUIDE.md`](docs/INTERVIEW_GUIDE.md) — technical interview preparation;
+- [`docs/CV_AND_INTERVIEW_POSITIONING.md`](docs/CV_AND_INTERVIEW_POSITIONING.md) — honest AI-assisted project positioning.
 
-## Learn with OptiDecarb
+## AI-assisted development — stated honestly
 
-v1.1 adds active learning without changing the engineering model:
+OptiDecarb was developed using **AI-assisted software development**. It is not presented as a project where every line of code was manually written by the student. The engineering and educational value comes from defining the problem and scope, challenging assumptions, researching public evidence, validating model behaviour, interpreting results, designing the learning workflow and making sure the methodology and limitations can be explained.
 
-- **worked calculations:** formula → scenario numbers → result → dimensional check;
-- **hand-checkable labs:** MW/MWh, battery duration, CRF and a three-hour battery dispatch;
-- **predict before running:** six guided one-change-at-a-time experiments;
-- **scenario comparison:** before / after / delta for PV, battery, grid, cost, NPV and CO₂;
-- **Explain this hour:** narrates one solved dispatch hour and checks its energy balance;
-- **Castellón walkthrough:** ten steps from public evidence to model limitations;
-- **concept check:** deterministic questions with explanations, no scores/accounts/AI;
-- **session-only progress:** optional learning progress without a database.
-
-The learning objective is not to memorize rules such as “higher WACC = less PV”. It is to trace the chain **WACC → CRF → annualized CAPEX → objective → optimal sizing**, run a controlled experiment, and interpret the actual solved result conditionally.
+AI is used here as a tool to learn and build faster — **not as a substitute for understanding**. The production app does not call an LLM at runtime to generate engineering explanations.
 
 ## How OptiDecarb works
 
@@ -82,13 +102,7 @@ The core and optimizer do not call HTTP/APIs. External research is converted int
 
 ## Why 8,760 hours?
 
-A non-leap year has `24 × 365 = 8,760` hours. Hourly modeling preserves:
-
-- load/PV coincidence;
-- battery state of charge;
-- charge/discharge timing;
-- hourly electricity-price exposure;
-- PV export versus onsite use.
+A non-leap year has `24 × 365 = 8,760` hours. Hourly modeling preserves load/PV coincidence, battery state of charge, charge/discharge timing, hourly electricity-price exposure and PV export versus onsite use.
 
 The UI may display one week, but the optimizer still solves the complete validated annual timeline.
 
@@ -126,7 +140,7 @@ case bundles
 
 The UI does not reimplement engineering equations.
 
-## v1.1 features
+## Engineering features
 
 ### Physical model
 
@@ -177,16 +191,7 @@ The UI does not reimplement engineering equations.
 
 ### Sensitivity
 
-Deterministic, one-at-a-time, **on-demand** families:
-
-- electricity price;
-- PV CAPEX;
-- battery CAPEX;
-- WACC;
-- grid-emission factor;
-- carbon target.
-
-OptiDecarb intentionally does not run every sensitivity family on every UI rerun.
+Deterministic, one-at-a-time, **on-demand** families: electricity price, PV CAPEX, battery CAPEX, WACC, grid-emission factor and carbon target.
 
 ### Explainability
 
@@ -207,6 +212,17 @@ OptiDecarb intentionally does not run every sensitivity family on every UI rerun
 - common engineering traps and concept dependencies;
 - compact concept check and final “design your own scenario” exercise;
 - no gamification, user accounts or LLM-generated explanations.
+
+### Junior Engineer & Industry Learning Lab
+
+- imperfect-data and sanity-check exercises;
+- eight deterministic real-work mini-cases with reasoning and next-data requests;
+- role-specific questions from operations, finance, sustainability, maintenance and management;
+- supplier-question labs for PV/EPC and batteries;
+- professional vocabulary in clear international English;
+- communication practice from model output to a 30-second management summary;
+- explicit screening-confidence and “what should happen next?” guidance;
+- honest AI-assisted project positioning.
 
 ## Representative Ceramic Plant — Castellón
 
@@ -263,29 +279,9 @@ Battery = 0 is a valid result. The model does not force every available technolo
 
 The unconstrained economic optimum already reduces modeled electrical CO₂ by ~30.4%. Therefore 10–30% targets do not alter the solution. The 40% target is binding and storage enters.
 
-Read the case study for the evidence, formulas, sensitivity and limitations behind these numbers.
-
 ## Streamlit interface
 
-Ten sections:
-
-1. Overview
-2. Inputs
-3. Baseline
-4. Optimized system
-5. Hourly results
-6. Economics
-7. Decarbonization
-8. Sensitivity
-9. Learning Lab
-10. Methodology & learning
-
-Inputs use `st.form`, so editing a value does not repeatedly trigger the 8,760-hour optimizer.
-
-The case selector provides:
-
-- **Representative Ceramic Plant — Castellón** (default showcase);
-- **Synthetic software demo** (regression/education reference).
+Twelve sections in v1.2, including **Junior Engineer Lab** and **About OptiDecarb**. Inputs use `st.form`, so editing a value does not repeatedly trigger the 8,760-hour optimizer.
 
 ## Installation
 
@@ -293,11 +289,8 @@ Python 3.11+:
 
 ```bash
 python -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows
-# .venv\Scripts\activate
-
+source .venv/bin/activate   # Linux/macOS
+# .venv\Scripts\activate  # Windows
 python -m pip install -e ".[dev,app]"
 ```
 
@@ -305,25 +298,6 @@ Engine-only installation:
 
 ```bash
 python -m pip install -e ".[dev]"
-```
-
-## Reproduce datasets
-
-```bash
-python scripts/generate_demo_data.py
-python scripts/build_ceramic_castellon_case.py
-```
-
-The ceramic builder produces deterministic offline snapshots and metadata.
-
-## Run models
-
-```bash
-python scripts/run_baseline.py
-python scripts/run_scenario.py
-python scripts/run_optimization.py
-python scripts/run_ceramic_castellon_case.py
-python scripts/run_student_examples.py
 ```
 
 ## Run web app
@@ -345,32 +319,22 @@ Golden Cases v1–v3 protect the synthetic engine history. `ceramic_castellon_ca
 
 ## Versioning
 
-- application/package: **v1.1.1**;
+- application/package: **v1.2.0**;
 - optimization model: **v0.3.0**;
 - representative case: **ceramic-castellon-v1**;
 - representative dataset: **ceramic-castellon-2025-v1**.
 
-The model version remains 0.3.0 because v1.1 adds education/UI services rather than new optimization equations.
+The model version remains 0.3.0 because v1.2 changes education, UI, visual identity and professional-learning content rather than the optimization equations.
 
 ## Important limitations
 
-OptiDecarb v1 does **not** model:
-
-- ceramic thermal-process energy, kilns, dryers or natural gas;
-- plant-specific measured data or contracts;
-- full industrial tariffs, network charges, demand charges or taxes;
-- PV/battery degradation and replacement;
-- taxes, depreciation, salvage value or detailed financing;
-- hourly grid-emission factors;
-- grid-to-battery arbitrage;
-- stochastic uncertainty;
-- detailed engineering, interconnection, structural studies or permitting.
+OptiDecarb v1 does **not** model ceramic thermal-process energy, plant-specific measured contracts, full industrial tariffs, degradation/replacement, taxes/depreciation, hourly grid-emission factors, grid-to-battery arbitrage, stochastic uncertainty or detailed engineering/interconnection/permitting.
 
 These limits are intentional. **Depth, traceability and a finished v1 are preferred to uncontrolled scope growth.**
 
 ## CV-ready description
 
-> Developed a Python techno-economic screening tool for industrial electrical decarbonization, combining 8,760-hour energy modelling, linear PV/battery sizing optimization, carbon constraints, NPV and sensitivity analysis, explainability, and a public-data-calibrated ceramic-industry case study for Castellón, Spain.
+> Designed and developed OptiDecarb, an AI-assisted Python learning and screening tool for industrial electrical decarbonization, using the project to develop practical skills in 8,760-hour energy modelling, techno-economic assessment, optimization, data validation and engineering decision-making.
 
 ## License
 
