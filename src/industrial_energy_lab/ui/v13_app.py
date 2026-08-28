@@ -26,6 +26,7 @@ from industrial_energy_lab.ui import v12_app as base
 from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
 _BASE_PAGE = base._page
+_BASE_ABOUT = base._about
 V13_SECTIONS = tuple("Industrial Energy Junior Lab" if section == "Junior Engineer Lab" else section for section in base.SECTIONS)
 
 
@@ -184,7 +185,7 @@ def _supplier_lab(st) -> None:
     ])
     st.dataframe(quote, hide_index=True, use_container_width=True)
     choice = st.radio("Which PV supplier is better from this table alone?", ("Supplier A", "Supplier B", "Not enough information yet"), index=None, key="quote_choice")
-    if st.button("Review PV quotation reasoning"):
+    if st.button("review PV quotation reasoning".title()):
         if choice == "Not enough information yet":
             st.success("Good: **not enough information yet.**")
         else:
@@ -218,20 +219,10 @@ def _communication_lab(st) -> None:
     st.caption("Communication stays inside the engineering problem: load, PV/BESS, economics, CO₂, uncertainty and next technical step.")
 
     st.markdown("### Five-line energy note")
-    st.code("""Context: We completed an initial PV screening for the industrial site.
-Finding: Around 3 MWp appears economically attractive under current assumptions.
-Assumption: Electricity price is still a wholesale energy-price proxy.
-Energy/project risk: Real tariff, export limits and available site area may change the business case.
-Next step: Validate interval data, tariff/site constraints and comparable EPC quotations.""")
+    st.code("""Context: We completed an initial PV screening for the industrial site.\nFinding: Around 3 MWp appears economically attractive under current assumptions.\nAssumption: Electricity price is still a wholesale energy-price proxy.\nEnergy/project risk: Real tariff, export limits and available site area may change the business case.\nNext step: Validate interval data, tariff/site constraints and comparable EPC quotations.""")
 
     st.markdown("### Email requesting missing energy data")
-    st.code("""Subject: Electricity data needed for the PV screening
-
-Hi [Name],
-
-Thanks for the information shared so far. Could you please send the interval electricity file, latest invoices/contract and any available information on the main meter, transformer and export conditions? These items are needed to validate the load profile and can materially change PV sizing and savings.
-
-Best regards,""")
+    st.code("""Subject: Electricity data needed for the PV screening\n\nHi [Name],\n\nThanks for the information shared so far. Could you please send the interval electricity file, latest invoices/contract and any available information on the main meter, transformer and export conditions? These items are needed to validate the load profile and can materially change PV sizing and savings.\n\nBest regards,""")
 
     st.markdown("### Manager challenge")
     st.text_area("Your manager asks: “Why should I trust your ~3 MWp recommendation?” Write 2–4 sentences before opening the example.", key="manager_challenge")
@@ -284,7 +275,7 @@ def _capstone(st) -> None:
     st.text_area("Write your energy recommendation before opening the worked solution", key="capstone_answer", height=160)
     with st.expander("Worked solution — open only after trying"):
         for i, answer in enumerate(CAPSTONE["worked_solution"], 1):
-            st.markdown(f"**{i}.** {answer}")
+            st.markdown(f"** {i}.** {answer}")
 
     st.markdown("### Castellón energy investment committee")
     st.caption("Answer each question aloud before opening the suggested response.")
@@ -332,7 +323,7 @@ def _junior_lab_v13(st) -> None:
 
 
 def _about_v13(st) -> None:
-    base._about(st)
+    _BASE_ABOUT(st)
     st.subheader("v1.3 — Industrial Energy Learning Architecture")
     st.write("The learning layer is intentionally focused on industrial electricity: load and metering, data quality, PV/BESS, electricity economics, optimization, carbon, site/project constraints, supplier review and energy recommendations. General career content is kept only when it directly supports an energy-engineering task. The mathematical model remains v0.3.0.")
 
@@ -349,8 +340,6 @@ def main() -> None:
     """Run the validated v1.2 UI shell with the energy-focused v1.3 learning layer."""
     base.SECTIONS = V13_SECTIONS
     base._page = _v13_page_router
-    base._junior_lab = _junior_lab_v13
-    base._about = _about_v13
     base.main()
 
 
