@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" role="img" aria-label="OptiDecarb logo">
+  <rect width="1200" height="260" rx="28" fill="#ffffff" fill-opacity="0"/>
+  <g transform="translate(18 18) scale(.43)">
+    <path d="M355 102a174 174 0 1 0 0 308" fill="none" stroke="#1768b2" stroke-width="62" stroke-linecap="round"/>
+    <rect x="132" y="279" width="38" height="76" rx="8" fill="#163f73"/>
+    <rect x="190" y="237" width="38" height="118" rx="8" fill="#163f73"/>
+    <rect x="248" y="195" width="38" height="160" rx="8" fill="#163f73"/>
+    <path d="M130 330l92-84 59 50 112-129" fill="none" stroke="#16a35b" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M358 142l54-9-12 53z" fill="#16a35b"/>
+  </g>
+  <text x="265" y="120" font-family="Arial, Helvetica, sans-serif" font-size="94" font-weight="700" fill="#0d2d55">OptiDecarb</text>
+  <text x="270" y="178" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="600" fill="#1768b2">Industrial Energy Optimization &amp; Learning</text>
+</svg>
