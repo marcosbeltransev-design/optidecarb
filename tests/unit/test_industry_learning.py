@@ -17,8 +17,8 @@ from industrial_energy_lab.ui.v12_app import SECTIONS
 from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
 
-def test_v12_version_does_not_change_engine_version():
-    assert APP_VERSION == "1.2.0"
+def test_app_version_does_not_change_engine_version():
+    assert APP_VERSION == "1.3.0"
     assert OPTIMIZATION_MODEL_VERSION == "0.3.0"
 
 
