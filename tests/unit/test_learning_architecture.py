@@ -11,12 +11,14 @@ from industrial_energy_lab.learning.readiness import (
     validate_readiness_catalog,
 )
 from industrial_energy_lab.ui import APP_VERSION
+from industrial_energy_lab.ui.v13_app import V13_SECTIONS
 from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
 
 def test_v13_keeps_validated_engine_version():
     assert APP_VERSION == "1.3.0"
     assert OPTIMIZATION_MODEL_VERSION == "0.3.0"
+    assert "Industrial Energy Junior Lab" in V13_SECTIONS
 
 
 def test_skill_map_is_industrial_energy_focused():
