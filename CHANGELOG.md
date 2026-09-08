@@ -1,5 +1,63 @@
 # Changelog
 
+## 1.3.2 — Energy Data Forensics & Evidence Traceability
+
+### Added
+
+- visual **Energy Data Forensics** exercises for missing intervals, duplicate timestamps, suspicious flatlines, unit-scale errors and net-meter sign conventions;
+- qualitative evidence-confidence ladder covering measured site data, official/public evidence, supplier/EPC information, proxies/benchmarks and explicit model assumptions;
+- **Trace the number** learning chains from source/evidence → assumption/proxy → calculation/model input → result → decision use;
+- sensitivity-to-evidence training that converts frozen one-at-a-time scenario results into practical next-data requests;
+- explicit warning that the sensitivity perturbations are not normalized to equal uncertainty and therefore are not a global statistical ranking;
+- session-review integration for missed forensic and evidence-priority concepts.
+
+### Changed
+
+- application/package version advanced to **1.3.2**;
+- README, static portfolio fallback and deployment recovery documentation aligned with the active learning architecture and current version;
+- Industrial Energy Junior Lab now asks the student to diagnose data before cleaning it and trace important results before trusting them.
+
+### Preserved
+
+- Optimization Model remains **v0.3.0**;
+- `ceramic-castellon-v1`, `ceramic-castellon-2025-v1` and frozen numerical regressions remain unchanged;
+- no changes to `core/`, `optimization/` or `economics/`;
+- no new energy technology, tariff engine, runtime AI or external runtime API.
+
+## 1.3.1 — Active Industrial Energy Learning
+
+### Added
+
+- semantic learning palette: blue=data/concept, green=validated/correct, amber=assumption/check and red=inconsistency/risk;
+- real 8,760-hour Castellón load/PV profile reading and load-duration curve;
+- formula → units → intuition exercises;
+- predict-before-reveal sensitivity lessons using frozen validated Castellón results;
+- one-day and one-hour electrical-balance reconstruction;
+- visual CO₂ frontier explaining non-binding versus binding targets;
+- MODEL KNOWS / MODEL ASSUMES / MODEL DOES NOT KNOW result cards;
+- screening-versus-feasibility comparison;
+- one smaller unseen transfer case;
+- session-only review of missed concepts and energy-specific interview defence.
+
+### Preserved
+
+- Optimization Model remains **v0.3.0** and the UI does not reimplement engineering equations;
+- committed Castellón data and regression targets remain unchanged.
+
+## 1.3.0 — Industrial Energy Learning Architecture
+
+### Added / Changed
+
+- refocused the Junior Engineer experience around **industrial electrical energy** rather than generic professional training;
+- introduced an energy-readiness diagnostic, energy-data/sanity-check workflow, electricity economics, site/project practice, PV/BESS supplier review, energy communication, AI validation and a Castellón energy capstone;
+- established the main learning chain: energy data → baseline → load/profile reasoning → PV/BESS → economics → optimization → CO₂ → sensitivity → site/project validation → recommendation;
+- kept professional communication and career material only where directly connected to an industrial-energy task.
+
+### Preserved
+
+- Optimization Model remains **v0.3.0**;
+- no new physics or energy technologies.
+
 ## 1.2.0 — Junior Engineer & Industry Learning Lab
 
 ### Added

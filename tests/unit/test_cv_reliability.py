@@ -9,7 +9,7 @@ def test_cv_reliability_healthcheck():
         DIAGNOSTIC_QUESTIONS,
         SKILLS,
     )
-    from industrial_energy_lab.ui import APP_VERSION, v131_app
+    from industrial_energy_lab.ui import APP_VERSION, v132_app
 
     root = Path(__file__).resolve().parents[2]
     entrypoint = root / "app.py"
@@ -19,8 +19,8 @@ def test_cv_reliability_healthcheck():
     spec.loader.exec_module(app_module)
 
     assert callable(app_module.main)
-    assert callable(v131_app.main)
-    assert APP_VERSION == "1.3.1"
+    assert callable(v132_app.main)
+    assert APP_VERSION == "1.3.2"
 
     for relative in (
         "assets/optidecarb-logo.svg",
