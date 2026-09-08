@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OptiDecarb — AI-assisted industrial energy screening and learning tool based on 8,760-hour PV/BESS optimisation.">
+  <meta name="theme-color" content="#0d2d55">
+  <title>OptiDecarb — Industrial Energy Optimization & Learning</title>
+  <style>
+    :root{--navy:#0d2d55;--blue:#1768b2;--green:#16a35b;--ink:#17324d;--muted:#5e7184;--bg:#f4f8fb;--card:#fff;--line:#dbe5ee}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#fff 0,#f4f8fb 55%,#eef5f8 100%);color:var(--ink);line-height:1.55}
+    a{color:inherit}.wrap{width:min(1080px,calc(100% - 36px));margin:auto}.hero{padding:64px 0 36px}.brand{display:flex;align-items:center;gap:18px}.mark{width:78px;height:78px;flex:0 0 auto}.brand h1{margin:0;color:var(--navy);font-size:clamp(2.3rem,6vw,4rem);letter-spacing:-.04em}.eyebrow{display:inline-flex;margin:26px 0 14px;padding:7px 12px;border:1px solid #c8dae9;border-radius:999px;background:#eef6fc;color:var(--blue);font-size:.82rem;font-weight:750;letter-spacing:.05em;text-transform:uppercase}.lead{max-width:790px;margin:0;font-size:clamp(1.12rem,2.4vw,1.42rem);color:#38536c}.actions{display:flex;flex-wrap:wrap;gap:11px;margin:28px 0 12px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:10px;text-decoration:none;font-weight:700;border:1px solid var(--line);background:#fff}.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn:hover{transform:translateY(-1px)}.wake{font-size:.91rem;color:var(--muted);margin:8px 0 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px 0}.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 26px rgba(13,45,85,.055)}.card h2{margin:0 0 10px;color:var(--navy);font-size:1.12rem}.card p{margin:0;color:#496277}.metric{display:grid;grid-template-columns:1fr auto;gap:7px 16px;font-size:.94rem}.metric span:nth-child(even){font-weight:750;color:var(--navy)}.section{padding:24px 0}.section h2{color:var(--navy);font-size:1.55rem;margin:0 0 12px}.section p{max-width:850px;color:#496277}.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.tag{padding:7px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:.86rem;font-weight:650;color:#39556e}.ai{border-left:4px solid var(--green);padding-left:18px}.footer{margin-top:32px;padding:28px 0 42px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}.footer strong{color:var(--navy)}
+    @media(max-width:780px){.hero{padding-top:38px}.brand{align-items:flex-start}.mark{width:62px;height:62px}.grid{grid-template-columns:1fr}.btn{width:100%}.actions{gap:9px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.btn:hover{transform:none}}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 520 520" role="img" aria-label="OptiDecarb logo mark">
+            <path d="M355 102a174 174 0 1 0 0 308" fill="none" stroke="#1768b2" stroke-width="62" stroke-linecap="round"/>
+            <rect x="132" y="279" width="38" height="76" rx="8" fill="#163f73"/>
+            <rect x="190" y="237" width="38" height="118" rx="8" fill="#163f73"/>
+            <rect x="248" y="195" width="38" height="160" rx="8" fill="#163f73"/>
+            <path d="M130 330l92-84 59 50 112-129" fill="none" stroke="#16a35b" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M358 142l54-9-12 53z" fill="#16a35b"/>
+          </svg>
+          <div><h1>OptiDecarb</h1><div style="font-weight:700;color:#1768b2">Industrial Energy Optimization &amp; Learning</div></div>
+        </div>
+        <div class="eyebrow">Industrial energy · PV/BESS · 8,760 hours</div>
+        <p class="lead">AI-assisted industrial energy screening and learning tool based on 8,760-hour PV/BESS optimisation, techno-economics, CO₂ constraints and engineering decision-making.</p>
+        <div class="actions">
+          <a class="btn primary" href="https://optidecarb.streamlit.app" target="_blank" rel="noopener">Open live app</a>
+          <a class="btn" href="https://github.com/marcosbeltransev-design/optidecarb" target="_blank" rel="noopener">View GitHub</a>
+          <a class="btn" href="https://github.com/marcosbeltransev-design/optidecarb/blob/main/cases/ceramic_castellon/CASE_STUDY.md" target="_blank" rel="noopener">See Castellón case</a>
+          <a class="btn" href="https://github.com/marcosbeltransev-design/optidecarb/blob/main/METHODOLOGY.md" target="_blank" rel="noopener">Methodology</a>
+        </div>
+        <p class="wake">The technical app is hosted on Streamlit Community Cloud and may occasionally need a short wake-up. This page remains available while it starts.</p>
+      </div>
+    </section>
+
+    <section class="wrap grid" aria-label="Project overview">
+      <article class="card"><h2>What it does</h2><p>Models industrial electricity hour by hour, evaluates PV and battery storage, optimizes system size and dispatch, then connects the result to economics, CO₂ and sensitivity.</p></article>
+      <article class="card"><h2>What I learned</h2><p>Energy-data validation, load and metering reasoning, PV/BESS techno-economics, linear optimization, sensitivity, model boundaries and how to turn a screening result into a defensible next step.</p></article>
+      <article class="card"><h2>Engineering scope</h2><p>Electricity + PV + battery + grid. It is a screening / pre-feasibility model, not detailed electrical design and not a model of ceramic thermal-process energy.</p></article>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Representative Ceramic Plant — Castellón</h2>
+        <p>A public-data-calibrated representative electrical case for the Castellón ceramic cluster. It is explicitly not a real factory or company dataset.</p>
+        <div class="card metric" style="max-width:720px">
+          <span>Annual electricity demand</span><span>15,000 MWh</span>
+          <span>Economic-optimum PV</span><span>≈ 2.97 MWp</span>
+          <span>Battery in base economic optimum</span><span>0 MWh</span>
+          <span>Electrical self-sufficiency</span><span>≈ 30.4%</span>
+          <span>40% CO₂ target</span><span>Binding; storage enters</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap ai">
+        <h2>AI-assisted, stated transparently</h2>
+        <p>OptiDecarb was developed with extensive AI assistance. The project is not presented as manually coded line-by-line. The engineering value comes from defining the problem and scope, challenging assumptions, validating model behaviour, researching traceable public evidence, interpreting results and understanding limitations.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Technical stack</h2>
+        <div class="stack"><span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag">NumPy</span><span class="tag">Pandas</span><span class="tag">SciPy / HiGHS</span><span class="tag">Plotly</span><span class="tag">8,760 h model</span><span class="tag">Linear Programming</span></div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap"><strong>OptiDecarb v1.3.0</strong> · Optimization Model v0.3.0 · Industrial electrical decarbonization screening &amp; learning.</div></footer>
+</body>
+</html>
