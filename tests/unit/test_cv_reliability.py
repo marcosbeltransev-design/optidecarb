@@ -1,8 +1,8 @@
+import importlib.util
 from pathlib import Path
 
 
 def test_cv_reliability_healthcheck():
-    import app
     from industrial_energy_lab.learning import INDUSTRY_CASES
     from industrial_energy_lab.learning.readiness import (
         DATA_QUALITY_CASES,
@@ -11,11 +11,17 @@ def test_cv_reliability_healthcheck():
     )
     from industrial_energy_lab.ui import APP_VERSION, v13_app
 
-    assert callable(app.main)
+    root = Path(__file__).resolve().parents[2]
+    entrypoint = root / "app.py"
+    spec = importlib.util.spec_from_file_location("optidecarb_app_entrypoint", entrypoint)
+    assert spec is not None and spec.loader is not None
+    app_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(app_module)
+
+    assert callable(app_module.main)
     assert callable(v13_app.main)
     assert APP_VERSION == "1.3.0"
 
-    root = Path(__file__).resolve().parents[2]
     for relative in (
         "assets/optidecarb-logo.svg",
         "assets/optidecarb-icon.svg",
