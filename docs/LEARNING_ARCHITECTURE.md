@@ -1,4 +1,4 @@
-# OptiDecarb v1.3 — Industrial Energy Learning Architecture
+# OptiDecarb v1.3.1 — Industrial Energy Learning Architecture
 
 ## Purpose
 
@@ -24,15 +24,33 @@ General professional skills appear only when they are attached to a real energy 
 10. **Site and operations** — meters, transformer/SLD awareness, production schedule, shutdowns, export/grid constraints and maintenance access.
 11. **Energy suppliers and communication** — comparable PV/BESS scope, guarantees, exclusions and clear professional recommendations.
 
-## Learning method
+## v1.3.1 active-learning method
 
-For the most important topics, OptiDecarb should prefer:
+The v1.3.1 layer changes **how** the existing content is learned rather than expanding the mathematical scope.
 
-**estimate → predict → calculate/run → observe → explain → challenge → decide what to check next**.
+For important concepts the preferred loop is:
 
-The objective is not to memorise terminology. A student should progress from:
+**estimate → predict → calculate/run → compare → explain why → decide what to check next**.
 
-**I have seen this → I understand it → I can calculate/use it → I can detect when it is wrong → I can explain it → I can support a better energy decision.**
+This is implemented through:
+
+- formula → units → intuition cards;
+- predict-before-reveal sensitivity exercises;
+- load-profile reading with the committed 8,760-hour Castellón dataset;
+- a load-duration curve with an explicit warning about lost chronology;
+- one-day and one-hour electrical-balance reconstruction;
+- a visual CO₂ target frontier showing the transition from non-binding to binding constraints;
+- MODEL KNOWS / MODEL ASSUMES / MODEL DOES NOT KNOW traceability cards;
+- screening-versus-feasibility comparisons;
+- one smaller unseen transfer case to test whether reasoning transfers beyond Castellón;
+- session-only review items for concepts answered incorrectly.
+
+The color system is semantic, not decorative:
+
+- **Blue** — data / concept;
+- **Green** — validated / correct;
+- **Amber** — assumption / item to check;
+- **Red** — inconsistency / risk.
 
 ## Recurring engineering mental models
 
@@ -46,6 +64,17 @@ The objective is not to memorise terminology. A student should progress from:
 - **WHAT WOULD CHANGE MY DECISION?** — which sensitivity matters?
 - **IS THE RESULT NEAR A BOUND?** — is a model limit shaping the optimum?
 - **IS THE PRECISION REAL?** — does the project stage support those decimals?
+
+## Why the visualizations exist
+
+Charts are included only where they help an engineering idea become intuitive.
+
+- **Representative-day load/PV chart:** learn coincidence and industrial-load shape.
+- **Load-duration curve:** learn load factor and demand distribution, while understanding why chronology is still required.
+- **One-day supply chart:** reconstruct load = PV-to-load + grid import at the battery-free economic optimum.
+- **CO₂ frontier:** see when an emissions constraint actually starts changing the optimized system.
+
+The visual layer reads committed offline case data or uses frozen regression outputs. It does not add a second calculation engine inside the UI.
 
 ## What OptiDecarb deliberately does not teach in depth
 
@@ -78,3 +107,7 @@ The final learning objective is to be able to answer:
 8. Which assumptions can change the recommendation?
 9. What site/tariff/grid facts are missing?
 10. What should the company do next?
+
+## Transfer beyond Castellón
+
+A second, deliberately smaller teaching case is included to test transfer rather than to create another full case study. Its purpose is to make the student use load factor, PV yield, hourly-profile reasoning and uncertainty on a different industrial context without being able to copy the Castellón conclusion.
