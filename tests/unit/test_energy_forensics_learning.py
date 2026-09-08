@@ -27,7 +27,10 @@ def test_forensic_cases_are_unique_and_decision_oriented():
         assert case.first_action
         assert case.professional_decision
         assert forensic_case(case.case_id) == case
-    joined = " ".join(case.title + case.context + case.why for case in FORENSIC_CASES).lower()
+    joined = " ".join(
+        " ".join((case.title, case.context, case.y_label, case.why, *case.options))
+        for case in FORENSIC_CASES
+    ).lower()
     for concept in ("missing", "duplicate", "flatline", "unit", "export"):
         assert concept in joined
 
