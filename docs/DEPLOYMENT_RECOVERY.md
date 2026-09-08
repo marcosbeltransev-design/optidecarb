@@ -8,12 +8,14 @@ This runbook exists so the public CV link can be restored without reconstructing
 - Branch: `main`
 - Streamlit entrypoint: `app.py`
 - Public technical app: `https://optidecarb.streamlit.app`
-- App version: `1.3.0`
+- App version: `1.3.1`
 - Optimization model: `0.3.0`
 - Python requirement: `>=3.11`
 - Streamlit: `1.62.0`
 - SciPy / HiGHS interface: `1.17.0` (pinned for regression reproducibility)
 - Install file: `requirements.txt` → `-e .[app]`
+
+The current `app.py` routes to the v1.3.1 active-learning UI layer, while the validated Optimization Model remains v0.3.0.
 
 ## If the Streamlit app is unavailable
 
