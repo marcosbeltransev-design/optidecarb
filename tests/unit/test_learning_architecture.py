@@ -15,8 +15,8 @@ from industrial_energy_lab.ui.v13_app import V13_SECTIONS
 from industrial_energy_lab.utils.version import OPTIMIZATION_MODEL_VERSION
 
 
-def test_v13_keeps_validated_engine_version():
-    assert APP_VERSION == "1.3.0"
+def test_v131_keeps_validated_engine_version():
+    assert APP_VERSION == "1.3.1"
     assert OPTIMIZATION_MODEL_VERSION == "0.3.0"
     assert "Industrial Energy Junior Lab" in V13_SECTIONS
 
